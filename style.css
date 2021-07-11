@@ -89,7 +89,7 @@ input {
   display: none;
 }
 
-form a {
+.button {
   display: inline-block;
   padding: 0.5em;
   background-color: rgb(41, 163, 126);
