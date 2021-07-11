@@ -60,8 +60,12 @@
     id("en").addEventListener("change", drawImage);
     id("cn").addEventListener("change", drawImage);
 
-    id("portrait").addEventListener("load", autoScale);
-    id("background").addEventListener("load", autoScale);
+    //Auto Scale
+    id("portraitAutoScale").addEventListener("click", autoScale);
+    id("backgroundAutoScale").addEventListener("click", autoScale);
+
+    id("portrait").addEventListener("load", drawImage);
+    id("background").addEventListener("load", drawImage);
 
     document.querySelectorAll("input[type=number]").forEach(e => {
       // Sync number input with slider
@@ -91,10 +95,11 @@
     id(this.dataset.image).src = window.URL.createObjectURL(this.files[0]);
   }
 
-  function autoScale() {
-    let newScale = id("editor").width / this.naturalWidth;
-    id(this.id + "Scale").value = newScale;
-    qs(`[data-slider="${this.id}Scale"]`).value = newScale;
+  function autoScale(e) {
+    e.preventDefault();
+    let newScale = id("editor").width / id(this.dataset.autoscale).naturalWidth;
+    id(this.dataset.autoscale + "Scale").value = newScale;
+    qs(`[data-slider="${this.dataset.autoscale}Scale"]`).value = newScale;
     drawImage();
   }
 
