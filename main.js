@@ -60,8 +60,8 @@
     id("en").addEventListener("change", drawImage);
     id("cn").addEventListener("change", drawImage);
 
-    id("portrait").addEventListener("load", drawImage);
-    id("background").addEventListener("load", drawImage);
+    id("portrait").addEventListener("load", autoScale);
+    id("background").addEventListener("load", autoScale);
 
     document.querySelectorAll("input[type=number]").forEach(e => {
       // Sync number input with slider
@@ -91,6 +91,13 @@
     id(this.dataset.image).src = window.URL.createObjectURL(this.files[0]);
   }
 
+  function autoScale() {
+    let newScale = id("editor").width / this.naturalWidth;
+    id(this.id + "Scale").value = newScale;
+    qs(`[data-slider="${this.id}Scale"]`).value = newScale;
+    drawImage();
+  }
+
   async function loadTextures() {
     if(!textures.background) {
       textures.bar = await loadImage("images/bar.png");
@@ -113,7 +120,9 @@
     const previewCanvas = id("preview");
     const previewCtx = previewCanvas.getContext("2d");
 
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
     previewCtx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
+
 
     // Load images for use
     await loadTextures();
@@ -130,7 +139,7 @@
 
 
     drawImageOffsetScale(ctx, background, id("backgroundScale").value,
-      canvas.width / 2, canvas.height / 2,
+      canvas.width / 2, id("background").naturalHeight * id("backgroundScale").value / 2,
       id("backgroundOffsetX").value, id("backgroundOffsetY").value);
 
     drawImageOffsetScale(ctx, portrait, id("portraitScale").value,
