@@ -184,7 +184,7 @@
 
       console.log(furiXPos);
 
-      ctx.fillText(p2, furiXPos, startYPos - fontSize - 2);
+      ctx.fillText(p2, furiXPos, startYPos - fontSize + 2);
 
       tmp += p1;
       last = offset + p1.length + p2.length + 4;
