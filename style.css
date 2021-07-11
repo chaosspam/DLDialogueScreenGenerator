@@ -1,0 +1,103 @@
+@font-face {
+  font-family: 'dragalialosten';
+  src: url('dragalialosten.ttf');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'dragalialostjp';
+  src: url('dragalialostjp.otf');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'dragalialostcn';
+  src: url('dragalialostcn.ttf');
+  font-weight: 400;
+  font-style: normal;
+}
+
+body {
+  background-color: #eee;
+  color: #434343;
+  font-family: 'Lato', Arial, sans-serif;
+}
+
+h1, h2 {
+  text-align: center;
+}
+
+h2 {
+  font-size: 1em;
+}
+
+canvas {
+  background-image: url("images/loading.gif");
+  background-position: right bottom;
+  background-repeat: no-repeat;
+  background-size: 25%;
+  background-color: black;
+}
+
+section, #uploadArea {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+#uploadArea > div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0 1em;
+}
+
+#uploadArea img {
+  max-height: 200px;
+  display: block;
+}
+
+form {
+  width: 100%;
+}
+
+form div, a{
+  margin-top: .75em;
+}
+
+form label {
+  display: block;
+}
+
+form input ~ label {
+  display: inline;
+}
+
+form input[type=number] {
+  width: 3em;
+}
+
+
+input {
+  font-family: 'Lato', Arial, sans-serif;
+}
+
+.hidden {
+  display: none;
+}
+
+form a {
+  display: inline-block;
+  padding: 0.5em;
+  background-color: rgb(41, 163, 126);
+  color: white;
+  text-decoration: none;
+}
+
+footer {
+  margin-top: 20px;
+  text-align: center;
+}

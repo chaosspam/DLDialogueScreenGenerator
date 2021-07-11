@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Lato&amp;family=Noto+Serif:ital@0;1&amp;display=swap" rel="stylesheet">
+  <link href="style.css" rel="stylesheet">
+  <script src="main.js"></script>
+  <title>龍絆對話畫面生成器</title>
+</head>
+<body>
+  <h1>龍絆對話畫面生成器</h1>
+  <section>
+    <canvas id="preview" width="250px" height="445px"></canvas>
+    <div>
+      <div id="uploadArea">
+        <div>
+          <h2>美術圖 (建議大小: 750x1334):</h2>
+          <img src="images/exampleDom.png" id="portrait">
+          <input id="portraitUpload" type="file" accept="image/*" data-image="portrait">
+          <form>
+            <div>
+              <label>美術圖左右調整</label>
+              <input type="number" id="portraitOffsetX" min="-200" max="200" value="0">
+              <input type="range" min="-200" max="200" value="0" data-slider="portraitOffsetX">
+            </div>
+            <div>
+              <label>美術圖上下調整</label>
+              <input type="number" id="portraitOffsetY" min="-200" max="200" value="0">
+              <input type="range" min="-200" max="200" value="0" data-slider="portraitOffsetY">
+            </div>
+            <div>
+              <label>美術圖放大/縮小</label>
+              <input type="number" id="portraitScale" min="0" max="3" step="0.1" value="1">
+              <input type="range" min="0" max="3" step="0.1" value="1" data-slider="portraitScale">
+            </div>
+          </form>
+        </div>
+        <div>
+          <h2>背景 (建議大小: 750x1334):</h2>
+          <img src="images/exampleBackground.png" id="background">
+          <input id="backgroundUpload" type="file" accept="image/*" data-image="background">
+          <form>
+            <div>
+              <label>背景左右調整</label>
+              <input type="number" id="backgroundOffsetX" min="-200" max="200" value="0">
+              <input type="range" min="-200" max="200" value="0" data-slider="backgroundOffsetX">
+            </div>
+            <div>
+              <label>背景上下調整</label>
+              <input type="number" id="backgroundOffsetY" min="-200" max="200" value="0">
+              <input type="range" min="-200" max="200" value="0" data-slider="backgroundOffsetY">
+            </div>
+            <div>
+              <label>背景放大/縮小</label>
+              <input type="number" id="backgroundScale" min="0" max="3" step="0.1" value="1">
+              <input type="range" min="0" max="3" step="0.1" value="1" data-slider="backgroundScale">
+            </div>
+          </form>
+        </div>
+      </div>
+      <form>
+        <div>
+          <label>角色名稱</label>
+          <input type="text" placeholder="Speaker Name" value="唐老大" id="name">
+        </div>
+        <div>
+          <label>對話內容</label>
+          <textarea name="" id="dialogue" cols="45" rows="5">「鄂牙」...確實是難纏的對手...&#13;&#10;不過，沒有什麼比家人之間的繫絆還要&#13;&#10;強大。</textarea>
+        </div>
+        <div>
+          <label>字型</label>
+          <input type="radio" id="en" name="font" value="en">
+          <label for="en">English</label>
+          <input type="radio" id="jp" name="font" value="jp">
+          <label for="jp">日本語</label>
+          <input type="radio" id="cn" name="font" value="cn" checked>
+          <label for="cn">中文</label>
+        </div>
+        <div>
+          <a href="#" id="download" download="dialogue_screen.png">下載</a>
+        </div>
+      </form>
+    </div>
+  </section>
+  <canvas id="editor" width="750px" height="1334px" class="hidden"></canvas>
+  <footer>
+    角色/圖像均為Cygames/任天堂所有
+    <a href="/DLDialogueScreenGenerator/">English</a>
+    <a href="/DLDialogueScreenGenerator/jp.html">日本語</a>
+    <a href="/DLDialogueScreenGenerator/cn.html">中文</a>
+  </footer>
+</body>
+</html>
