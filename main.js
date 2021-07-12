@@ -31,6 +31,8 @@
   }
   const furiganaSize = 15;
   const textures = {};
+  const emotionFromSide = 180;
+  const emotionYPos = 250;
 
   let drawing = false;
 
@@ -59,6 +61,9 @@
     id("jp").addEventListener("change", drawImage);
     id("en").addEventListener("change", drawImage);
     id("cn").addEventListener("change", drawImage);
+    id("emotion").addEventListener("change", drawImage);
+    id("left").addEventListener("change", drawImage);
+    id("right").addEventListener("change", drawImage);
 
     //Auto Scale
     id("portraitAutoScale").addEventListener("click", autoScale);
@@ -150,6 +155,23 @@
     drawImageOffsetScale(ctx, portrait, id("portraitScale").value,
       canvas.width / 2, canvas.height / 2,
       id("portraitOffsetX").value, id("portraitOffsetY").value);
+
+    // Draw Emotion
+    let emotionName = id("emotion").value;
+    if(emotionName !== "none") {
+      let emotionSide = qs("input[name=emotionside]:checked").value;
+      emotionName += "_" + emotionSide;
+
+      if(!textures[emotionName]) {
+        textures[emotionName] = await loadImage("images/" + emotionName + ".png");
+      }
+
+      const emotion = textures[emotionName];
+
+      drawImageOffsetScale(ctx, emotion, 1,
+        emotionSide === "l" ? emotionFromSide : canvas.width - emotionFromSide, emotionYPos,
+        id("emotionOffsetX").value, id("emotionOffsetY").value);
+    }
 
     ctx.drawImage(bar, 0, 0);
 

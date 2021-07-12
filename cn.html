@@ -67,6 +67,40 @@
       <form>
         <button type="submit" disabled style="display: none" aria-hidden="true"></button>
         <div>
+          <label>表情</label>
+          <select id="emotion">
+            <option value="none" selected>無</option>
+            <option value="anger">生氣</option>
+            <option value="bad">煩惱</option>
+            <option value="exclamation">驚嘆</option>
+            <option value="heart">心</option>
+            <option value="inspiration">靈感</option>
+            <option value="note">音符</option>
+            <option value="notice">注意</option>
+            <option value="notice2">注意 2</option>
+            <option value="question">問號</option>
+            <option value="sleep">睡覺</option>
+            <option value="sweat">汗</option>
+          </select>
+        </div>
+        <div>
+          <label>位置</label>
+          <input type="radio" id="left" name="emotionside" value="l" checked>
+          <label for="left">左</label>
+          <input type="radio" id="right" name="emotionside" value="r">
+          <label for="right">右</label>
+        </div>
+        <div>
+          <label>表情左右調整</label>
+          <input type="number" id="emotionOffsetX" min="-200" max="200" value="0">
+          <input type="range" min="-200" max="200" value="0" data-slider="emotionOffsetX">
+        </div>
+        <div>
+          <label>表情上下調整</label>
+          <input type="number" id="emotionOffsetY" min="-200" max="200" value="0">
+          <input type="range" min="-200" max="200" value="0" data-slider="emotionOffsetY">
+        </div>
+        <div>
           <label>角色名稱</label>
           <input type="text" placeholder="Speaker Name" value="唐老大" id="name">
         </div>

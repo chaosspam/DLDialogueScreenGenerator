@@ -67,6 +67,40 @@
       <form>
         <button type="submit" disabled style="display: none" aria-hidden="true"></button>
         <div>
+          <label>吹き出し</label>
+          <select id="emotion">
+            <option value="none" selected>なし</option>
+            <option value="anger">怒り</option>
+            <option value="bad">モヤモヤ</option>
+            <option value="exclamation">感嘆符</option>
+            <option value="heart">ハート</option>
+            <option value="inspiration">ひらめき</option>
+            <option value="note">音符</option>
+            <option value="notice">注目</option>
+            <option value="notice2">注目 2</option>
+            <option value="question">疑問符</option>
+            <option value="sleep">ZZZ</option>
+            <option value="sweat">汗</option>
+          </select>
+        </div>
+        <div>
+          <label>位置</label>
+          <input type="radio" id="left" name="emotionside" value="l" checked>
+          <label for="left">左</label>
+          <input type="radio" id="right" name="emotionside" value="r">
+          <label for="right">右</label>
+        </div>
+        <div>
+          <label>吹き出しの左右の位置を調整</label>
+          <input type="number" id="emotionOffsetX" min="-200" max="200" value="0">
+          <input type="range" min="-200" max="200" value="0" data-slider="emotionOffsetX">
+        </div>
+        <div>
+          <label>吹き出しの上下の位置を調整</label>
+          <input type="number" id="emotionOffsetY" min="-200" max="200" value="0">
+          <input type="range" min="-200" max="200" value="0" data-slider="emotionOffsetY">
+        </div>
+        <div>
           <label>キャラ名</label>
           <input type="text" placeholder="Speaker Name" value="ドミニク・トレット" id="name">
         </div>
