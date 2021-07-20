@@ -7,59 +7,59 @@
   <link href="https://fonts.googleapis.com/css2?family=Lato&amp;family=Noto+Serif:ital@0;1&amp;display=swap" rel="stylesheet">
   <link href="style.css" rel="stylesheet">
   <script src="main.js"></script>
-  <title>Dragalia Lost Dialogue Screen Generator</title>
+  <title>龙约对话画面生成器</title>
 </head>
 <body>
-  <h1>Dragalia Lost Dialogue Screen Generator</h1>
+  <h1>龙约对话画面生成器</h1>
   <section>
     <canvas id="preview" width="250px" height="445px"></canvas>
     <div>
       <div id="uploadArea">
         <div>
-          <h2>Portrait Image (Reccommended Size: 750x1334):</h2>
+          <h2>美术图 (建议大小: 750x1334):</h2>
           <img src="images/exampleDom.png" id="portrait">
           <input id="portraitUpload" type="file" accept="image/*" data-image="portrait">
           <form>
             <button type="submit" disabled style="display: none" aria-hidden="true"></button>
             <div>
-              <label>Portrait Offset X</label>
+              <label>美术图左右调整</label>
               <input type="number" id="portraitOffsetX" min="-200" max="200" value="0">
               <input type="range" min="-200" max="200" value="0" data-slider="portraitOffsetX">
             </div>
             <div>
-              <label>Portrait Offset Y</label>
+              <label>美术图上下调整</label>
               <input type="number" id="portraitOffsetY" min="-200" max="200" value="0">
               <input type="range" min="-200" max="200" value="0" data-slider="portraitOffsetY">
             </div>
             <div>
-              <label>Portrait Scale</label>
+              <label>美术图放大/缩小</label>
               <input type="number" id="portraitScale" min="0" max="3" step="0.1" value="1">
               <input type="range" min="0" max="3" step="0.1" value="1" data-slider="portraitScale">
-              <button id="portraitAutoScale" data-autoScale="portrait">Auto</button>
+              <button id="portraitAutoScale" data-autoScale="portrait">自動</button>
             </div>
           </form>
         </div>
         <div>
-          <h2>Background Image (Reccommended Size: 750x1334):</h2>
+          <h2>背景 (建议大小: 750x1334):</h2>
           <img src="images/exampleBackground.png" id="background">
           <input id="backgroundUpload" type="file" accept="image/*" data-image="background">
           <form>
             <button type="submit" disabled style="display: none" aria-hidden="true"></button>
             <div>
-              <label>Background Offset X</label>
+              <label>背景左右调整</label>
               <input type="number" id="backgroundOffsetX" min="-200" max="200" value="0">
               <input type="range" min="-200" max="200" value="0" data-slider="backgroundOffsetX">
             </div>
             <div>
-              <label>Background Offset Y</label>
+              <label>背景上下调整</label>
               <input type="number" id="backgroundOffsetY" min="-200" max="200" value="0">
               <input type="range" min="-200" max="200" value="0" data-slider="backgroundOffsetY">
             </div>
             <div>
-              <label>Background Scale</label>
+              <label>背景放大/缩小</label>
               <input type="number" id="backgroundScale" min="0" max="3" step="0.1" value="1">
               <input type="range" min="0" max="3" step="0.1" value="1" data-slider="backgroundScale">
-              <button id="backgroundAutoScale" data-autoScale="background">Auto</button>
+              <button id="backgroundAutoScale" data-autoScale="background">自動</button>
             </div>
           </form>
         </div>
@@ -67,63 +67,63 @@
       <form>
         <button type="submit" disabled style="display: none" aria-hidden="true"></button>
         <div>
-          <label>Emotion</label>
+          <label>表情</label>
           <select id="emotion">
-            <option value="none" selected>None</option>
-            <option value="anger">Anger</option>
-            <option value="bad">Bad</option>
-            <option value="exclamation">Exclamation</option>
-            <option value="heart">Heart</option>
-            <option value="inspiration">Inspiration</option>
-            <option value="note">Note</option>
-            <option value="notice">Notice</option>
-            <option value="question">Question</option>
-            <option value="sleep">Sleep</option>
-            <option value="sweat">Sweat</option>
+            <option value="none" selected>无</option>
+            <option value="anger">生气</option>
+            <option value="bad">烦恼</option>
+            <option value="exclamation">惊叹</option>
+            <option value="heart">心</option>
+            <option value="inspiration">灵感</option>
+            <option value="note">音符</option>
+            <option value="notice">注意</option>
+            <option value="question">问号</option>
+            <option value="sleep">睡觉</option>
+            <option value="sweat">汗</option>
           </select>
         </div>
         <div>
-          <label>Side</label>
+          <label>位置</label>
           <input type="radio" id="left" name="emotionside" value="l" checked>
-          <label for="left">Left</label>
+          <label for="left">左</label>
           <input type="radio" id="right" name="emotionside" value="r">
-          <label for="right">Right</label>
+          <label for="right">右</label>
         </div>
         <div>
-          <label>Emotion Offset X</label>
+          <label>表情左右调整</label>
           <input type="number" id="emotionOffsetX" min="-200" max="200" value="0">
           <input type="range" min="-200" max="200" value="0" data-slider="emotionOffsetX">
         </div>
         <div>
-          <label>Emotion Offset Y</label>
+          <label>表情上下调整</label>
           <input type="number" id="emotionOffsetY" min="-200" max="200" value="0">
           <input type="range" min="-200" max="200" value="0" data-slider="emotionOffsetY">
         </div>
         <div>
-          <label>Speaker Name</label>
-          <input type="text" placeholder="Speaker Name" value="Fleur" id="name">
+          <label>角色名称</label>
+          <input type="text" placeholder="Speaker Name" value="芙露璐" id="name">
         </div>
         <div>
-          <label>Dialogue Text</label>
-          <textarea name="" id="dialogue" cols="45" rows="5">I'm gonna make tons of memories this &#13;&#10;summer and turn them all into painings!</textarea>
+          <label>对话内容</label>
+          <textarea name="" id="dialogue" cols="45" rows="5">好～人家要创造好多夏天的回忆，&#13;&#10;然后把它们全部用画记录下来！</textarea>
         </div>
         <div>
-          <label>Font</label>
-          <input type="radio" id="en" name="font" value="en" checked>
+          <label>字型</label>
+          <input type="radio" id="en" name="font" value="en">
           <label for="en">English</label>
           <input type="radio" id="jp" name="font" value="jp">
           <label for="jp">日本語</label>
-          <input type="radio" id="cn" name="font" value="cn">
+          <input type="radio" id="cn" name="font" value="cn" checked>
           <label for="cn">中文</label>
         </div>
         <div>
-          <a href="#" id="download" class="button" download="dialogue_screen.png">Download</a>
+          <a href="#" id="download" class="button" download="dialogue_screen.png">下载</a>
         </div>
         <nav>
-          <p>Some handy links:</p>
+          <p>实用连结:</p>
           <ul>
-            <li><a href="https://dlportraits.space/" target="_blank">sh0wer1ee's Portrait Viewer</a></li>
-            <li><a href="https://dragalialost.wiki/w/Category:Background_Art" target="_blank">Dragalia Lost Wiki's Background Art Category</a></li>
+            <li><a href="https://dlportraits.space/" target="_blank">sh0wer1ee的美术图生成器</a></li>
+            <li><a href="https://dragalialost.wiki/w/Category:Background_Art" target="_blank">维基的背景图</a></li>
           </ul>
         </nav>
       </form>
@@ -131,7 +131,7 @@
   </section>
   <canvas id="editor" width="750px" height="1334px" class="hidden"></canvas>
   <footer>
-    All characters/images belong to Cygames and Nintendo
+    角色/图像均为Cygames/任天堂所有
     <a href="/DLDialogueScreenGenerator/">English</a>
     <a href="/DLDialogueScreenGenerator/jp.html">日本語</a>
     <a href="/DLDialogueScreenGenerator/zh_tw.html">繁體中文</a>
