@@ -10,9 +10,18 @@
       "dialogueYPos": 930,
       "lineHeight": 52,
     },
-    "cn": {
+    "zh_tw": {
       "nameSize": 32,
-      "dialogueSize": 32,
+      "dialogueSize": "900 32",
+      "speakerXPos": 45,
+      "speakerYPos": 820,
+      "dialogueXPos": 75,
+      "dialogueYPos": 930,
+      "lineHeight": 70,
+    },
+    "zh_cn": {
+      "nameSize": "900 32",
+      "dialogueSize": "900 32",
       "speakerXPos": 45,
       "speakerYPos": 820,
       "dialogueXPos": 75,
@@ -42,7 +51,8 @@
     // Wait for font load before drawing
     await document.fonts.load("30px dragalialosten");
     await document.fonts.load("30px dragalialostjp");
-    await document.fonts.load("30px dragalialostcn");
+    await document.fonts.load("30px dragalialostzh_tw");
+    await document.fonts.load("30px dragalialostzh_cn");
     await drawImage();
     setupListener();
   }
@@ -60,7 +70,8 @@
     id("dialogue").addEventListener("change", drawImage);
     id("jp").addEventListener("change", drawImage);
     id("en").addEventListener("change", drawImage);
-    id("cn").addEventListener("change", drawImage);
+    id("zh_tw").addEventListener("change", drawImage);
+    id("zh_cn").addEventListener("change", drawImage);
     id("emotion").addEventListener("change", drawImage);
     id("left").addEventListener("change", drawImage);
     id("right").addEventListener("change", drawImage);
@@ -112,7 +123,8 @@
     if(!textures.background) {
       textures.bar = await loadImage("images/bar.png");
       textures.skipjp = await loadImage("images/skipjp.png");
-      textures.skipcn = await loadImage("images/skipcn.png");
+      textures.skipzh_tw = await loadImage("images/skipcn.png");
+      textures.skipzh_cn = await loadImage("images/skipcn.png");
     }
   }
 
