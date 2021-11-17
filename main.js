@@ -482,7 +482,7 @@
     settingContainer.appendChild(layerNameContainer);
     settingContainer.appendChild(createSliderGroup(loc.layerOffsetX, -200, 200, 1, 0, (value) => { layer.offsetX = value; drawDialogueScreen(); }));
     settingContainer.appendChild(createSliderGroup(loc.layerOffsetY, -200, 200, 1, 0, (value) => { layer.offsetY = value; drawDialogueScreen(); }));
-    settingContainer.appendChild(createSliderGroup(loc.layerRotation, -360, 360, 0.1, 0, (value) => { layer.rotation = value; drawDialogueScreen(); }));
+    settingContainer.appendChild(createSliderGroup(loc.layerRotation, -180, 180, 0.1, 0, (value) => { layer.rotation = value; drawDialogueScreen(); }));
     let scaleSliderGroup = createSliderGroup(loc.layerScale, 0, 3, 0.1, 1, (value) => { layer.scale = value; drawDialogueScreen(); });
 
     let autoButton = document.createElement("button");
