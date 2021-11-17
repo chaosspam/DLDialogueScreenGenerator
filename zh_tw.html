@@ -1,112 +1,91 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh_tw">
 <head>
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Lato&amp;family=Noto+Serif:ital@0;1&amp;display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@900&display=swap" rel="stylesheet">
   <link href="style.css" rel="stylesheet">
   <script src="main.js"></script>
   <title>龍絆對話畫面生成器</title>
 </head>
 <body>
   <h1>龍絆對話畫面生成器</h1>
+  <canvas id="preview" width="250px" height="445px"></canvas>
   <section>
-    <canvas id="preview" width="250px" height="445px"></canvas>
-    <div>
-      <div id="uploadArea">
-        <div>
-          <h2>美術圖 (建議大小: 750x1334):</h2>
-          <img src="images/examplePortrait.png" id="portrait">
-          <input id="portraitUpload" type="file" accept="image/*" data-image="portrait">
-          <form>
-            <button type="submit" disabled style="display: none" aria-hidden="true"></button>
-            <div>
-              <label>美術圖左右調整</label>
-              <input type="number" id="portraitOffsetX" min="-200" max="200" value="0">
-              <input type="range" min="-200" max="200" value="0" data-slider="portraitOffsetX">
-            </div>
-            <div>
-              <label>美術圖上下調整</label>
-              <input type="number" id="portraitOffsetY" min="-200" max="200" value="0">
-              <input type="range" min="-200" max="200" value="0" data-slider="portraitOffsetY">
-            </div>
-            <div>
-              <label>美術圖放大/縮小</label>
-              <input type="number" id="portraitScale" min="0" max="3" step="0.1" value="1">
-              <input type="range" min="0" max="3" step="0.1" value="1" data-slider="portraitScale">
-              <button id="portraitAutoScale" data-autoScale="portrait">自動</button>
-            </div>
-          </form>
+      <div id="uploadArea" class="settings">
+
+        <div id="tabBar" class="tab-bar">
+          <button id="addLayer">+</button>
         </div>
-        <div>
-          <h2>背景 (建議大小: 750x1334):</h2>
-          <img src="images/exampleBackground.png" id="background">
-          <input id="backgroundUpload" type="file" accept="image/*" data-image="background">
-          <form>
-            <button type="submit" disabled style="display: none" aria-hidden="true"></button>
+
+        <!-- <div class="tab active">
+          <div>
+
+            <h2>Layer Image</h2>
+            <label>(Reccommended Size: 750x1334)</label>
+            <img src="images/adPortrait.png">
+            <input type="file" accept="image/*" >
+            <button class="button delete">Delete Layer</button>
+          </div>
+          <div>
             <div>
-              <label>背景左右調整</label>
-              <input type="number" id="backgroundOffsetX" min="-200" max="200" value="0">
-              <input type="range" min="-200" max="200" value="0" data-slider="backgroundOffsetX">
+              <label>Layer Name</label>
+              <input type="text" placeholder="Layer Name" value="Layer 1">
             </div>
+
             <div>
-              <label>背景上下調整</label>
-              <input type="number" id="backgroundOffsetY" min="-200" max="200" value="0">
-              <input type="range" min="-200" max="200" value="0" data-slider="backgroundOffsetY">
+              <label>Layer Offset X</label>
+              <div class="input-group">
+                <input type="number" min="-200" max="200" value="0">
+                <input type="range" min="-200" max="200" value="0">
+              </div>
             </div>
+
             <div>
-              <label>背景放大/縮小</label>
-              <input type="number" id="backgroundScale" min="0" max="3" step="0.1" value="1">
-              <input type="range" min="0" max="3" step="0.1" value="1" data-slider="backgroundScale">
-              <button id="backgroundAutoScale" data-autoScale="background">自動</button>
+              <label>Layer Offset Y</label>
+              <div class="input-group">
+                <input type="number" min="-200" max="200" value="0">
+                <input type="range" min="-200" max="200" value="0">
+              </div>
             </div>
-          </form>
-        </div>
+
+            <div>
+              <label>Layer Rotation</label>
+              <div class="input-group">
+                <input type="number" min="-360" max="360" value="0">
+                <input type="range" min="-360" max="360" value="0">
+              </div>
+            </div>
+
+            <div>
+              <label>Layer Scale</label>
+              <div class="input-group">
+                <input type="number" min="0" max="3" step="0.1" value="1">
+                <input type="range" min="0" max="3" step="0.1" value="1">
+              </div>
+              <button class="button">Auto</button>
+            </div>
+
+          </div>
+        </div> -->
       </div>
-      <form>
-        <button type="submit" disabled style="display: none" aria-hidden="true"></button>
-        <div>
-          <label>表情</label>
-          <select id="emotion">
-            <option value="none" selected>無</option>
-            <option value="anger">生氣</option>
-            <option value="bad">煩惱</option>
-            <option value="exclamation">驚嘆</option>
-            <option value="heart">心</option>
-            <option value="inspiration">靈感</option>
-            <option value="note">音符</option>
-            <option value="notice">注意</option>
-            <option value="question">問號</option>
-            <option value="sleep">睡覺</option>
-            <option value="sweat">汗</option>
-          </select>
-        </div>
-        <div>
-          <label>位置</label>
-          <input type="radio" id="left" name="emotionside" value="l" checked>
-          <label for="left">左</label>
-          <input type="radio" id="right" name="emotionside" value="r">
-          <label for="right">右</label>
-        </div>
-        <div>
-          <label>表情左右調整</label>
-          <input type="number" id="emotionOffsetX" min="-200" max="200" value="0">
-          <input type="range" min="-200" max="200" value="0" data-slider="emotionOffsetX">
-        </div>
-        <div>
-          <label>表情上下調整</label>
-          <input type="number" id="emotionOffsetY" min="-200" max="200" value="0">
-          <input type="range" min="-200" max="200" value="0" data-slider="emotionOffsetY">
-        </div>
+
+      <div id="dialogueArea" class="settings">
+
         <div>
           <label>角色名稱</label>
-          <input type="text" placeholder="Speaker Name" value="芙露璐" id="name">
+          <input type="text" placeholder="角色名稱" value="芙露璐" id="name">
         </div>
+
         <div>
           <label>對話內容</label>
           <textarea name="" id="dialogue" cols="45" rows="5">好～人家要創造好多夏天的回憶，&#13;&#10;然後把它們全部用畫記錄下來！</textarea>
         </div>
+
         <div>
           <label>字型</label>
           <input type="radio" id="en" name="font" value="en">
@@ -118,9 +97,53 @@
           <input type="radio" id="zh_cn" name="font" value="zh_cn">
           <label for="cn">简体中文</label>
         </div>
+
         <div>
-          <a href="#" id="download" class="button" download="dialogue_screen.png">下載</a>
+          <label>表情</label>
+          <select id="emotion">
+            <option value="none" selected>無</option>
+            <option value="anger">生氣</option>
+            <option value="bad">煩惱</option>
+            <option value="exclamation">驚嘆</option>
+            <option value="heart">愛心</option>
+            <option value="inspiration">靈感</option>
+            <option value="note">音符</option>
+            <option value="notice">注意</option>
+            <option value="question">問號</option>
+            <option value="sleep">睡覺</option>
+            <option value="sweat">汗</option>
+          </select>
         </div>
+
+        <div>
+          <label>位置</label>
+          <input type="radio" id="left" name="emotionside" value="l" checked>
+          <label for="left">左</label>
+          <input type="radio" id="right" name="emotionside" value="r">
+          <label for="right">右</label>
+        </div>
+
+        <div>
+          <label>表情左右調整</label>
+          <div class="input-group">
+            <input type="number" id="emotionOffsetX" min="-200" max="200" value="0">
+            <input type="range" min="-200" max="200" value="0" data-slider="emotionOffsetX">
+          </div>
+        </div>
+
+        <div>
+          <label>表情上下調整</label>
+          <div class="input-group">
+            <input type="number" id="emotionOffsetY" min="-200" max="200" value="0">
+            <input type="range" min="-200" max="200" value="0" data-slider="emotionOffsetY">
+          </div>
+        </div>
+
+        <div>
+          <button class="button" id="download">下載</button>
+          <a href="#" id="downloadLink" class="hidden" download="dialogue_screen.png"></a>
+        </div>
+
         <nav>
           <p>實用連結:</p>
           <ul>
@@ -128,8 +151,8 @@
             <li><a href="https://dragalialost.wiki/w/Category:Background_Art" target="_blank">維基的背景圖</a></li>
           </ul>
         </nav>
-      </form>
-    </div>
+
+      </div>
   </section>
   <canvas id="editor" width="750px" height="1334px" class="hidden"></canvas>
   <footer>
@@ -138,6 +161,14 @@
     <a href="/DLDialogueScreenGenerator/jp.html">日本語</a>
     <a href="/DLDialogueScreenGenerator/zh_tw.html">繁體中文</a>
     <a href="/DLDialogueScreenGenerator/zh_cn.html">简体中文</a>
+    <a href='https://ko-fi.com/N4N34N2U2' target='_blank'><img height='36' style='border:0px;height:24px;vertical-align:sub;' src='https://cdn.ko-fi.com/cdn/kofi1.png?v=2' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
   </footer>
+  <div id="deletePrompt" class="hidden">
+    <div>
+      <p>確定刪除此圖層?</p>
+      <button class="button delete" id="deleteConfirmBtn">刪除</button>
+      <button class="button" id="deleteCancelBtn">取消</button>
+    </div>
+  </div>
 </body>
 </html>
