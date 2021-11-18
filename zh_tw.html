@@ -22,6 +22,7 @@
           <button id="addLayer">+</button>
         </div>
 
+        <div id="tabs">
         <!-- <div class="tab active">
           <div>
 
@@ -72,6 +73,43 @@
 
           </div>
         </div> -->
+        </div>
+
+        <div id="portraitPanel" class="hidden">
+          <h3>美術圖 (以 <a href="https://dlportraits.space/" target="_blank">sh0wer1ee大神的美術圖生成器提供</a>)</h3>
+          <input type="text" autocomplete="off" list="portraitList" id="portraitCharacter">
+          <datalist id="portraitList">
+          </datalist>
+          <br>
+          <label>臉部</label>
+          <hr>
+          <div id="facialExpression"></div>
+          <label>嘴部</label>
+          <hr>
+          <div id="mouthExpression"></div>
+        </div>
+
+        <div id="backgroundPanel" class="hidden">
+          <h3>背景圖 (由 <a href="https://dragalialost.wiki/w/Category:Background_Art" target="_blank">Dragalia Lost Wiki</a> 提供)</h3>
+          <div>
+            <label>全景</label>
+            <hr>
+            <div id="backgroundBackgroundArt" class="carousel">
+            </div>
+            <label>天空</label>
+            <hr>
+            <div id="skyboxBackgroundArt" class="carousel">
+            </div>
+            <label>雲</label>
+            <hr>
+            <div id="cloudBackgroundArt" class="carousel">
+            </div>
+            <label>覆蓋</label>
+            <hr>
+            <div id="overlayBackgroundArt" class="carousel">
+            </div>
+          </div>
+        </div>
       </div>
 
       <div id="dialogueArea" class="settings">
@@ -143,14 +181,6 @@
           <button class="button" id="download">下載</button>
           <a href="#" id="downloadLink" class="hidden" download="dialogue_screen.png"></a>
         </div>
-
-        <nav>
-          <p>實用連結:</p>
-          <ul>
-            <li><a href="https://dlportraits.space/" target="_blank">sh0wer1ee的美術圖生成器</a></li>
-            <li><a href="https://dragalialost.wiki/w/Category:Background_Art" target="_blank">維基的背景圖</a></li>
-          </ul>
-        </nav>
 
       </div>
   </section>

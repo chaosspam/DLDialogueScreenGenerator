@@ -1,7 +1,7 @@
 (function () {
 
   const textProperties = {
-    "en": {
+    "en_us": {
       "nameSize": 30,
       "dialogueSize": 32,
       "speakerXPos": 45,
@@ -19,7 +19,7 @@
         "layerOffsetY": "Offset Y",
         "layerRotation": "Rotation",
         "layerScale": "Scale",
-        "auto": "Auto",
+        "auto": "Fit Canvas",
         "noDeleteBaseLayer": "Base layer cannot be removed!",
         "deleteLayerConfirm": "Are you sure you want to delete this layer?",
         "deleteLayer": "Delete Layer",
@@ -27,6 +27,8 @@
         "portrait": "Portrait",
         "download": "Download",
         "generating": "Generating Image...",
+        "fromBackground": "Background",
+        "fromPortrait": "Portrait",
       }
     },
     "zh_tw": {
@@ -47,7 +49,7 @@
         "layerOffsetY": "上下調整",
         "layerRotation": "旋轉",
         "layerScale": "放大/縮小",
-        "auto": "自動",
+        "auto": "符合畫面",
         "noDeleteBaseLayer": "無法刪除基底圖層!",
         "deleteLayerConfirm": "確定刪除此圖層?",
         "deleteLayer": "刪除圖層",
@@ -55,6 +57,8 @@
         "portrait": "美術圖",
         "download": "下載",
         "generating": "圖片生成中...",
+        "fromBackground": "背景",
+        "fromPortrait": "美術圖",
       }
     },
     "zh_cn": {
@@ -75,7 +79,7 @@
         "layerOffsetY": "上下调整",
         "layerRotation": "旋转",
         "layerScale": "放大/缩小",
-        "auto": "自动",
+        "auto": "符合画面",
         "noDeleteBaseLayer": "无法删除基底图层!",
         "deleteLayerConfirm": "确定删除此图层?",
         "deleteLayer": "删除图层",
@@ -83,6 +87,8 @@
         "portrait": "美术图",
         "download": "下载",
         "generating": "图片生成中...",
+        "fromBackground": "背景",
+        "fromPortrait": "美术图",
       }
     },
     "jp": {
@@ -103,13 +109,15 @@
         "layerOffsetY": "上下位置調整",
         "layerRotation": "回転",
         "layerScale": "拡大・縮小",
-        "auto": "おまかせ",
+        "auto": "画面に合う",
         "noDeleteBaseLayer": "ベースレイヤーは削除できません!",
         "deleteLayer": "レイヤーを削除",
         "background": "背景",
         "portrait": "イラスト",
         "download": "ダウンロード",
         "generating": "Loading...",
+        "fromBackground": "背景",
+        "fromPortrait": "イラスト",
       }
     }
   }
@@ -122,8 +130,24 @@
   const layers = [];
 
   let drawing = false;
-  let pageLanguage = "en";
+  let pageLanguage = "en_us";
   let layerId = 0;
+
+  let portraitCanvas = document.createElement("canvas");
+  portraitCanvas.width = 1024;
+  portraitCanvas.height = 1024;
+
+  let currentPortraitData =
+  {
+    "base": "",
+    "offset": {"x": 0, "y": 0},
+    "face": "",
+    "mouth": "",
+  }
+
+  let backgroundData = { };
+
+  const backgroundPaginationSize = 12;
 
   window.addEventListener("load", init);
 
@@ -139,6 +163,8 @@
       await document.fonts.load("30px dragalialostzh_tw");
       await document.fonts.load("30px dragalialostzh_cn");
       await drawDialogueScreen();
+      await fetchBackgroundImages();
+      await populatePortraitData();
     } catch(e) {
       console.error(e);
     }
@@ -199,14 +225,6 @@
 
   function changeImage() {
     id(this.dataset.image).src = window.URL.createObjectURL(this.files[0]);
-  }
-
-  function autoScale(e) {
-    e.preventDefault();
-    let newScale = id("editor").width / id(this.dataset.autoscale).naturalWidth;
-    id(this.dataset.autoscale + "Scale").value = newScale;
-    qs(`[data-slider="${this.dataset.autoscale}Scale"]`).value = newScale;
-    drawDialogueScreen();
   }
 
   async function loadTextures() {
@@ -273,7 +291,7 @@
 
     ctx.drawImage(bar, 0, 0);
 
-    if(font !== "en") {
+    if(font !== "en_us") {
       ctx.drawImage(textures["skip" + font], 0, 0);
     }
 
@@ -294,11 +312,7 @@
       this.innerText = textProperties[pageLanguage].loc.download;
       id("downloadLink").href = URL.createObjectURL(blob);
       id("downloadLink").click();
-    }, "image/png")
-
-
-    //id("downloadLink").href = id("editor").toDataURL("image/png").replace("image/png", "image/octet-stream");
-    //id("downloadLink").click();
+    }, "image/png");
   }
 
   function printDialogue(text, font, fontSize, startXPos, startYPos, ctx) {
@@ -316,7 +330,7 @@
       ctx.font = furiganaSize + "px dragalialost" + font;
       let furiXPos = center - ctx.measureText(p2).width / 2;
 
-      console.log(furiXPos);
+      //console.log(furiXPos);
 
       ctx.fillText(p2, furiXPos, startYPos - fontSize + 2);
 
@@ -383,6 +397,7 @@
       qsa(".tab").forEach(e => e.classList.remove("active"));
       this.classList.add("active");
       tab.classList.add("active");
+      resetPanels();
     });
 
     qsa("#tabBar button").forEach(e => e.classList.remove("active"));
@@ -391,7 +406,7 @@
     tab.classList.add("active");
 
     id("tabBar").insertBefore(tabButton, id("addLayer"));
-    id("uploadArea").appendChild(tab);
+    id("tabs").appendChild(tab);
 
     layers.push(newLayer);
   }
@@ -453,13 +468,15 @@
       });
 
       openLayerDeleteModal();
-    })
+    });
 
     deleteButton.innerText = loc.deleteLayer;
 
     imageContainer.appendChild(image);
     imageContainer.appendChild(uploadButton);
     imageContainer.appendChild(deleteButton);
+    imageContainer.appendChild(portraitPanelToggleButton());
+    imageContainer.appendChild(bgPanelToggleButton());
 
     // Create the right part of the tab
     let settingContainer = document.createElement("div");
@@ -480,8 +497,8 @@
     layerNameContainer.appendChild(layerNameInput);
 
     settingContainer.appendChild(layerNameContainer);
-    settingContainer.appendChild(createSliderGroup(loc.layerOffsetX, -200, 200, 1, 0, (value) => { layer.offsetX = value; drawDialogueScreen(); }));
-    settingContainer.appendChild(createSliderGroup(loc.layerOffsetY, -200, 200, 1, 0, (value) => { layer.offsetY = value; drawDialogueScreen(); }));
+    settingContainer.appendChild(createSliderGroup(loc.layerOffsetX, -400, 400, 1, 0, (value) => { layer.offsetX = value; drawDialogueScreen(); }));
+    settingContainer.appendChild(createSliderGroup(loc.layerOffsetY, -400, 400, 1, 0, (value) => { layer.offsetY = value; drawDialogueScreen(); }));
     settingContainer.appendChild(createSliderGroup(loc.layerRotation, -180, 180, 0.1, 0, (value) => { layer.rotation = value; drawDialogueScreen(); }));
     let scaleSliderGroup = createSliderGroup(loc.layerScale, 0, 3, 0.1, 1, (value) => { layer.scale = value; drawDialogueScreen(); });
 
@@ -490,9 +507,10 @@
     autoButton.innerText = loc.auto;
     autoButton.addEventListener("click", () => {
       let newScale = id("editor").width / image.naturalWidth;
-      scaleSliderGroup.querySelector("input[type=num]").value = newScale;
+      let numInput = scaleSliderGroup.querySelector("input[type=number]");
       scaleSliderGroup.querySelector("input[type=range]").value = newScale;
-      drawDialogueScreen();
+      numInput.value = newScale;
+      numInput.dispatchEvent(new Event('change'));
     });
 
     scaleSliderGroup.appendChild(autoButton);
@@ -546,6 +564,8 @@
     return layerId;
   }
 
+  /* Layer Delete Modal */
+
   function openLayerDeleteModal() {
     id("deletePrompt").classList.remove("hidden");
   }
@@ -553,6 +573,234 @@
   function closeLayerDeletePrompt() {
     id("deletePrompt").classList.add("hidden");
   }
+
+  /* Background Panel */
+
+  function resetPanels() {
+    id("portraitPanel").classList.add("hidden");
+    id("backgroundPanel").classList.add("hidden");
+    id("portraitCharacter").value = "";
+    id("facialExpression").innerHTML = "";
+    id("mouthExpression").innerHTML = "";
+    qsa(".tab .portrait-button").forEach(e => e.classList.remove("selected"));
+    qsa(".tab .bg-button").forEach(e => e.classList.remove("selected"));
+    currentPortraitData =
+    {
+      "base": "",
+      "offset": {"x": 0, "y": 0},
+      "face": "",
+      "mouth": "",
+    }
+  }
+
+  function bgPanelToggleButton() {
+    let button = document.createElement("button");
+    button.innerText = textProperties[pageLanguage].loc.fromBackground;
+    button.classList.add("button");
+    button.classList.add("bg-button");
+    button.addEventListener("click", toggleBackgroundPanel);
+    return button;
+  }
+
+  function toggleBackgroundPanel() {
+    // Toggle background panel
+    let backgroundHidden = id("backgroundPanel").classList.toggle("hidden");
+    this.classList.toggle("selected", !backgroundHidden);
+
+    // If panel is shown, update portrait panel
+    if(!backgroundHidden) {
+      id("portraitPanel").classList.add("hidden");
+      qs(".tab.active .portrait-button").classList.remove("selected");
+    }
+  }
+
+  async function fetchBackgroundImages() {
+    let data = await fetchJson("data/background_data.json");
+
+    for(let i = 0; i < data.length; i++) {
+      if(backgroundData[data[i].type] === undefined) {
+        backgroundData[data[i].type] = { "imgs": [], "index": 0 };
+      }
+      backgroundData[data[i].type].imgs.push(data[i]);
+    }
+
+    createPagination(id("backgroundBackgroundArt"), backgroundData.background, backgroundPaginationSize);
+    createPagination(id("skyboxBackgroundArt"), backgroundData.skybox, backgroundPaginationSize);
+    createPagination(id("cloudBackgroundArt"), backgroundData.cloud, backgroundPaginationSize);
+    createPagination(id("overlayBackgroundArt"), backgroundData.overlay, backgroundPaginationSize);
+  }
+
+  function createPagination(container, data, size) {
+    let bgs = [];
+
+    let prev = document.createElement("button");
+    let next = document.createElement("button");
+    prev.innerText = "<";
+    next.innerText = ">";
+    prev.classList.add("button");
+    next.classList.add("button");
+
+    let imageContainer = document.createElement("div");
+    imageContainer.classList.add("bg-container");
+
+    for(let i = 0; i < size; i ++) {
+      let bg = document.createElement("img");
+      if(i < data.imgs.length) {
+        bg.src = data.imgs[i].url;
+      } else {
+        bg.classList.add("hidden");
+      }
+      bg.addEventListener("click", function() {
+        let activeImage = qs(".tab.active img");
+        activeImage.crossOrigin = "anonymous";
+        activeImage.src = this.src;
+      });
+      bgs.push(bg);
+      imageContainer.appendChild(bg);
+    }
+
+    prev.addEventListener("click", () => {
+      data.index -= size;
+      if(data.index < 0) {
+        data.index = 0;
+      }
+      for(let i = 0; i < size; i++) {
+        if(i + data.index < data.imgs.length) {
+          bgs[i].src = data.imgs[i + data.index].url;
+          bgs[i].classList.remove("hidden");
+        }
+        else {
+          bgs[i].classList.add("hidden");
+        }
+      }
+    });
+
+    next.addEventListener("click", () => {
+      if(data.index + size >= data.imgs.length) {
+        return;
+      }
+      data.index += size;
+      for(let i = 0; i < size; i++) {
+        if(i + data.index < data.imgs.length) {
+          bgs[i].src = data.imgs[i + data.index].url;
+          bgs[i].classList.remove("hidden");
+        }
+        else {
+          bgs[i].classList.add("hidden");
+        }
+      }
+    });
+
+    container.appendChild(prev);
+    container.appendChild(imageContainer);
+    container.appendChild(next);
+  }
+
+  /* Portrait Panel */
+
+  function portraitPanelToggleButton() {
+    let button = document.createElement("button");
+    button.innerText = textProperties[pageLanguage].loc.fromPortrait;
+    button.addEventListener("click", togglePortraitPanel);
+    button.classList.add("button");
+    button.classList.add("portrait-button");
+    return button;
+  }
+
+  function togglePortraitPanel() {
+    // Toggle portrait panel
+    let portraitHidden = id("portraitPanel").classList.toggle("hidden");
+    this.classList.toggle("selected", !portraitHidden);
+
+    // If panel is shown, update bg panel
+    if(!portraitHidden) {
+      id("backgroundPanel").classList.add("hidden");
+      qs(".tab.active .bg-button").classList.remove("selected");
+    }
+  }
+
+  async function populatePortraitData() {
+    let portraitData = await fetchJson("https://dlportraits.space/portrait_output/localizedDirData.json");
+    let datalist = id("portraitList");
+    for(file in portraitData.fileList) {
+      let option = document.createElement("option");
+      option.value = portraitData.fileList[file][pageLanguage];
+      option.dataset.id = file;
+      datalist.appendChild(option);
+    }
+
+    id("portraitCharacter").addEventListener("change", validateDatalistInput);
+  }
+
+  function validateDatalistInput() {
+    let option = document.querySelector(`#portraitList option[value="${this.value}"]`);
+    if (option === null) {
+      this.value = "";
+    } else {
+      loadSelectedPortraitData(option.dataset.id);
+    }
+  }
+
+  async function loadSelectedPortraitData(portraitId) {
+    let data = await fetchJson(`https://dlportraits.space/portrait_output/${portraitId}/data.json`);
+
+    let faceContainer = id("facialExpression");
+    faceContainer.innerHTML = "";
+    for(let i = 0; i < data.partsData.faceParts.length; i++) {
+      let facePartUrl = `https://dlportraits.space/${data.partsData.faceParts[i].substring(2)}`;
+      let facePart = document.createElement("img");
+      facePart.src = facePartUrl;
+      facePart.addEventListener("click", function() {
+        currentPortraitData.face = this.src;
+        drawPortraitAndRender();
+      });
+      faceContainer.appendChild(facePart);
+    }
+
+    let mouthContainer = id("mouthExpression");
+    mouthContainer.innerHTML = "";
+    for(let i = 0; i < data.partsData.mouthParts.length; i++) {
+      let mouthPartUrl = `https://dlportraits.space/${data.partsData.mouthParts[i].substring(2)}`;
+      let mouthPart = document.createElement("img");
+      mouthPart.src = mouthPartUrl;
+      mouthPart.addEventListener("click", function() {
+        currentPortraitData.mouth = this.src;
+        drawPortraitAndRender();
+      });
+      mouthContainer.appendChild(mouthPart);
+    }
+
+    currentPortraitData.face = "";
+    currentPortraitData.mouth = "";
+    currentPortraitData.base = `https://dlportraits.space/portrait_output/${portraitId}/${portraitId}_base.png`;
+    currentPortraitData.offset = data.offset;
+
+    drawPortraitAndRender();
+  }
+
+  async function drawPortraitAndRender() {
+    const ctx = portraitCanvas.getContext("2d");
+    ctx.clearRect(0, 0, portraitCanvas.width, portraitCanvas.height);
+
+    const baseImage = await loadImage(currentPortraitData.base);
+    ctx.drawImage(baseImage, 0, 0);
+
+    if(currentPortraitData.face !== "") {
+      const faceImage = await loadImage(currentPortraitData.face);
+      ctx.drawImage(faceImage, currentPortraitData.offset.x, currentPortraitData.offset.y);
+    }
+
+    if(currentPortraitData.mouth !== "") {
+      const mouthImage = await loadImage(currentPortraitData.mouth);
+      ctx.drawImage(mouthImage, currentPortraitData.offset.x, currentPortraitData.offset.y);
+    }
+
+    const blob = await new Promise(resolve => portraitCanvas.toBlob(resolve));
+    const url = URL.createObjectURL(blob);
+    qs(".tab.active img").src = url;
+  }
+
+  /* Helper functions */
 
   function id(elementId) {
     return document.getElementById(elementId);
@@ -564,6 +812,20 @@
 
   function qsa(selector) {
     return document.querySelectorAll(selector);
+  }
+
+  async function fetchJson(url) {
+    try {
+      let response = await fetch(url);
+      if(response.ok) {
+        let json = await response.json();
+        return json;
+      } else {
+        throw new error(await response.text());
+      }
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   function loadImage(src){

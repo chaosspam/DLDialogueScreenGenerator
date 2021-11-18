@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en_us">
 <head>
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -22,6 +22,7 @@
           <button id="addLayer">+</button>
         </div>
 
+        <div id="tabs">
         <!-- <div class="tab active">
           <div>
 
@@ -72,6 +73,44 @@
 
           </div>
         </div> -->
+        </div>
+
+        <div id="portraitPanel" class="hidden">
+          <h3>Character (Powered by <a href="https://dlportraits.space/" target="_blank">sh0wer1ee's Portrait Viewer</a>)</h3>
+          <input type="text" autocomplete="off" list="portraitList" id="portraitCharacter">
+          <datalist id="portraitList">
+          </datalist>
+          <br>
+          <label>Facial Expression</label>
+          <hr>
+          <div id="facialExpression"></div>
+          <label>Mouth Expression</label>
+          <hr>
+          <div id="mouthExpression"></div>
+        </div>
+
+        <div id="backgroundPanel" class="hidden">
+          <h3>Background Art (From <a href="https://dragalialost.wiki/w/Category:Background_Art" target="_blank">Dragalia Lost Wiki</a>)</h3>
+          <div>
+            <label>Full</label>
+            <hr>
+            <div id="backgroundBackgroundArt" class="carousel">
+            </div>
+            <label>Skybox</label>
+            <hr>
+            <div id="skyboxBackgroundArt" class="carousel">
+            </div>
+            <label>Cloud</label>
+            <hr>
+            <div id="cloudBackgroundArt" class="carousel">
+            </div>
+            <label>Overlay</label>
+            <hr>
+            <div id="overlayBackgroundArt" class="carousel">
+            </div>
+          </div>
+        </div>
+
       </div>
 
       <div id="dialogueArea" class="settings">
@@ -88,7 +127,7 @@
 
         <div>
           <label>Font</label>
-          <input type="radio" id="en" name="font" value="en" checked>
+          <input type="radio" id="en" name="font" value="en_us" checked>
           <label for="en">English</label>
           <input type="radio" id="jp" name="font" value="jp">
           <label for="jp">日本語</label>
@@ -144,19 +183,11 @@
           <a href="#" id="downloadLink" class="hidden" download="dialogue_screen.png"></a>
         </div>
 
-        <nav>
-          <p>Some handy links:</p>
-          <ul>
-            <li><a href="https://dlportraits.space/" target="_blank">sh0wer1ee's Portrait Viewer</a></li>
-            <li><a href="https://dragalialost.wiki/w/Category:Background_Art" target="_blank">Dragalia Lost Wiki's Background Art Category</a></li>
-          </ul>
-        </nav>
-
       </div>
   </section>
   <canvas id="editor" width="750px" height="1334px" class="hidden"></canvas>
   <footer>
-    <iframe src="https://store.steampowered.com/widget/1764410/" frameborder="0" width="646" height="190"></iframe>
+    <iframe src="https://store.steampowered.com/widget/1764410/" frameborder="0" height="190" style='width:100%;max-width:646px;'></iframe>
     <p>(Sorry for the shameless self promotion)</p>
     All characters/images belong to Cygames and Nintendo
     <a href="/DLDialogueScreenGenerator/">English</a>

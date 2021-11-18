@@ -22,6 +22,7 @@
           <button id="addLayer">+</button>
         </div>
 
+        <div id="tabs">
         <!-- <div class="tab active">
           <div>
 
@@ -72,13 +73,50 @@
 
           </div>
         </div> -->
+        </div>
+
+        <div id="portraitPanel" class="hidden">
+          <h3>美术图 (以 <a href="https://dlportraits.space/" target="_blank">sh0wer1ee大佬的美术图生成器提供</a>)</h3>
+          <input type="text" autocomplete="off" list="portraitList" id="portraitCharacter">
+          <datalist id="portraitList">
+          </datalist>
+          <br>
+          <label>面部</label>
+          <hr>
+          <div id="facialExpression"></div>
+          <label>嘴部</label>
+          <hr>
+          <div id="mouthExpression"></div>
+        </div>
+
+        <div id="backgroundPanel" class="hidden">
+          <h3>背景图 (由 <a href="https://dragalialost.wiki/w/Category:Background_Art" target="_blank">Dragalia Lost Wiki</a> 提供)</h3>
+          <div>
+            <label>全景</label>
+            <hr>
+            <div id="backgroundBackgroundArt" class="carousel">
+            </div>
+            <label>天空</label>
+            <hr>
+            <div id="skyboxBackgroundArt" class="carousel">
+            </div>
+            <label>云</label>
+            <hr>
+            <div id="cloudBackgroundArt" class="carousel">
+            </div>
+            <label>复盖</label>
+            <hr>
+            <div id="overlayBackgroundArt" class="carousel">
+            </div>
+          </div>
+        </div>
       </div>
 
       <div id="dialogueArea" class="settings">
 
         <div>
           <label>角色名称</label>
-          <input type="text" placeholder="角色名称" value="芙露璐" id="name">
+          <input type="text" placeholder="角色名称" value="芙露露" id="name">
         </div>
 
         <div>
@@ -143,14 +181,6 @@
           <button class="button" id="download">下载</button>
           <a href="#" id="downloadLink" class="hidden" download="dialogue_screen.png"></a>
         </div>
-
-        <nav>
-          <p>实用连结:</p>
-          <ul>
-            <li><a href="https://dlportraits.space/" target="_blank">sh0wer1ee的美术图生成器</a></li>
-            <li><a href="https://dragalialost.wiki/w/Category:Background_Art" target="_blank">维基的背景图</a></li>
-          </ul>
-        </nav>
 
       </div>
   </section>
