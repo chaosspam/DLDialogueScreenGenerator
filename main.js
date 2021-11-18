@@ -646,14 +646,15 @@
     for(let i = 0; i < size; i ++) {
       let bg = document.createElement("img");
       if(i < data.imgs.length) {
-        bg.src = data.imgs[i].url;
+        bg.src = `https://dragalialost.wiki/thumb.php?f=${data.imgs[i].fileName}&width=75`;
+        bg.dataset.fullSrc = data.imgs[i].url;
       } else {
         bg.classList.add("hidden");
       }
       bg.addEventListener("click", function() {
         let activeImage = qs(".tab.active img");
         activeImage.crossOrigin = "anonymous";
-        activeImage.src = this.src;
+        activeImage.src = this.dataset.fullSrc;
       });
       bgs.push(bg);
       imageContainer.appendChild(bg);
@@ -666,7 +667,8 @@
       }
       for(let i = 0; i < size; i++) {
         if(i + data.index < data.imgs.length) {
-          bgs[i].src = data.imgs[i + data.index].url;
+          bgs[i].src = `https://dragalialost.wiki/thumb.php?f=${data.imgs[i + data.index].fileName}&width=75`;
+          bgs[i].dataset.fullSrc = data.imgs[i + data.index].url;
           bgs[i].classList.remove("hidden");
         }
         else {
@@ -682,7 +684,8 @@
       data.index += size;
       for(let i = 0; i < size; i++) {
         if(i + data.index < data.imgs.length) {
-          bgs[i].src = data.imgs[i + data.index].url;
+          bgs[i].src = `https://dragalialost.wiki/thumb.php?f=${data.imgs[i + data.index].fileName}&width=75`;
+          bgs[i].dataset.fullSrc = data.imgs[i + data.index].url;
           bgs[i].classList.remove("hidden");
         }
         else {
