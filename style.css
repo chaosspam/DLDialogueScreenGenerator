@@ -40,6 +40,7 @@ body {
 h1 {
   font-size: 1.75em;
   padding: 20px 0;
+  text-transform: uppercase;
   font-family: "Inter", "Helvetica Neue", Helvetica, Arial, "PingFang TC", "黑體-繁", "Heiti TC",
     "蘋果儷中黑", "Apple LiGothic Medium", "微軟正黑體", "Microsoft JhengHei", sans-serif;
 }
@@ -77,9 +78,12 @@ section {
   display: flex;
   flex-wrap: wrap;
   width: 100%;
+  list-style: none;
+  padding: 0;
+  margin: 0;
 }
 
-.tab-bar button {
+.tab-bar li {
   padding: 0.5em 0.75em;
   margin: 0 4px 0 0;
   font-size: 1em;
@@ -91,14 +95,23 @@ section {
   color: white;
   text-decoration: none;
   cursor: pointer;
+  user-select: none;
 }
 
-.tab-bar button:hover {
+.tab-bar li:hover {
   background-color: rgb(118, 89, 245);
 }
 
-.tab-bar button.active {
+.tab-bar li.active {
   background-color: rgb(41, 163, 126);
+}
+
+.tab-bar li.dragging {
+  background-color: rgb(84, 104, 98);
+}
+
+.tab-bar li:hover {
+  background-color: rgb(118, 89, 245);
 }
 
 .tab {

@@ -6,47 +6,50 @@
   let i18n;
   let pageLang = "en_us";
 
+  // Screen drawing data
   const furiganaSize = 15;
   const textures = {};
   const emotionFromSide = 180;
   const emotionYPos = 250;
-
   const layers = [];
-
+  const layerToRemove = {};
   let drawing = false;
-  let pageLanguage = "en_us";
   let layerId = 0;
 
-  let portraitCanvas = document.createElement("canvas");
-  portraitCanvas.width = 1024;
-  portraitCanvas.height = 1024;
+  // Portrait drawing data
+  const PORTRAIT_URL = "https://dlportraits.space/";
+  let portraitCanvas;
+  const currentPortraitData = {};
 
-  let currentPortraitData =
-  {
-    "base": "",
-    "offset": {"x": 0, "y": 0},
-    "face": "",
-    "mouth": "",
-  }
-
-  let backgroundData = { };
-
+  // Background drawing data
+  const THUMB_URL = "https://dragalialost.wiki/thumb.php?width=75&f="
+  const backgroundData = {};
   const backgroundPaginationSize = 12;
+
+  /* Setup */
 
   window.addEventListener("load", init);
 
+  /**
+   * Initialize canvas and localization data
+   */
   async function init() {
-    // Wait for font load before drawing
-    pageLanguage = document.documentElement.lang;
-    addLayer(textProperties[pageLanguage].loc.background, "images/exampleBackground.png");
-    addLayer(textProperties[pageLanguage].loc.portrait, textProperties[pageLanguage].loc.defaultPortraitSrc);
-
     try {
+      // Load localization data
+      i18n = await fetchJson("data/i18n.json");
+      pageLang = document.documentElement.lang;
+      // Add default layers
+      addLayer(i18n[pageLang].loc.background, "images/exampleBackground.png");
+      addLayer(i18n[pageLang].loc.portrait, i18n[pageLang].loc.defaultPortraitSrc);
+      // Wait for fonts to load before drawing
       await document.fonts.load("30px dragalialosten");
       await document.fonts.load("30px dragalialostjp");
       await document.fonts.load("30px dragalialostzh_tw");
       await document.fonts.load("30px dragalialostzh_cn");
+      // Draw dialogue screen
       await drawDialogueScreen();
+      // Fetch background and portrait data
+      setupPortrait();
       await fetchBackgroundImages();
       await populatePortraitData();
     } catch(e) {
@@ -60,55 +63,51 @@
    * Set up event listeners
    */
   function setupListener() {
-    id("addLayer").addEventListener("click", () => { addLayer(`${textProperties[pageLanguage].loc.layer} ${layers.length}`, "images/adPortrait.png") });
+    id("addLayer").addEventListener("click", () => {
+      addLayer(`${i18n[pageLang].loc.layer} ${layers.length}`, "images/adPortrait.png")
+    });
 
     // Draw image after parameter change
     id("name").addEventListener("change", drawDialogueScreen);
     id("dialogue").addEventListener("change", drawDialogueScreen);
-    id("jp").addEventListener("change", drawDialogueScreen);
-    id("en").addEventListener("change", drawDialogueScreen);
-    id("zh_tw").addEventListener("change", drawDialogueScreen);
-    id("zh_cn").addEventListener("change", drawDialogueScreen);
-
     id("emotion").addEventListener("change", drawDialogueScreen);
-    id("left").addEventListener("change", drawDialogueScreen);
-    id("right").addEventListener("change", drawDialogueScreen);
+    qsa("#dialogueArea input[type=radio]").forEach(e => e.addEventListener("change", drawDialogueScreen));
+    qsa("#dialogueArea input[type=number]").forEach(e => {
+      syncSliderWithInput(qs(`[data-slider="${e.id}"]`), e);
+      e.addEventListener("change", drawDialogueScreen);
+    });
 
-    id("download").addEventListener("click", downloadImage);
-
+    id("deleteConfirmBtn").addEventListener("click", removeLayer);
     id("deleteCancelBtn").addEventListener("click", closeLayerDeletePrompt);
+    window.addEventListener("dragover", tabDragOver);
+
     document.addEventListener('keydown', function(e){
       if(e.key === "Escape"){
         closeLayerDeletePrompt();
       }
     });
 
-    document.querySelectorAll("#dialogueArea input[type=number]").forEach(e => {
-      // Sync number input with slider
-      qs(`[data-slider="${e.id}"]`).addEventListener("input", sliderUpdateNumInput);
-      qs(`[data-slider="${e.id}"]`).addEventListener("change", sliderChangeNumInput);
-      e.addEventListener("input", numInputUpdateSlider);
-      e.addEventListener("change", drawDialogueScreen);
-    });
+    id("download").addEventListener("click", downloadImage);
   }
 
-  function sliderUpdateNumInput() {
-    let input = id(this.dataset.slider);
-    input.value = this.value;
+  /**
+   * Setup portrait canvas and data
+   */
+  function setupPortrait() {
+    portraitCanvas = document.createElement("canvas");
+    portraitCanvas.width = 1024;
+    portraitCanvas.height = 1024;
+    resetPortraitData();
   }
 
-  function sliderChangeNumInput() {
-    let input = id(this.dataset.slider);
-    input.dispatchEvent(new Event('change'));
-  }
-
-  function numInputUpdateSlider() {
-    let slider = qs(`[data-slider="${this.id}"]`);
-    slider.value = this.value;
-  }
-
-  function changeImage() {
-    id(this.dataset.image).src = window.URL.createObjectURL(this.files[0]);
+  /**
+   * Clears portrait data
+   */
+  function resetPortraitData() {
+    currentPortraitData.base = "";
+    currentPortraitData.offset = {"x": 0, "y": 0};
+    currentPortraitData.face = "";
+    currentPortraitData.mouth = "";
   }
 
   async function loadTextures() {
@@ -121,112 +120,59 @@
   }
 
   /**
-   * Draws the summon screen based on inputs
+   * Draws the dialogue screen based on inputs
    */
   async function drawDialogueScreen() {
-    if(drawing) return;
 
+    if(drawing) return;
     drawing = true;
 
     // Get canvas context
     const canvas = id("editor");
+    const preview = id("preview");
     const ctx = canvas.getContext("2d");
-    const previewCanvas = id("preview");
-    const previewCtx = previewCanvas.getContext("2d");
+    const ctxPreview = preview.getContext("2d");
 
     // Clear the canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    previewCtx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
+    ctxPreview.clearRect(0, 0, preview.width, preview.height);
 
     // Load images for use
     await loadTextures();
     const bar = textures.bar;
-    const font =  qs("input[name=font]:checked").value;
-
-    // Get parameters
-    const speakerName = id("name").value;
-    const dialogue = id("dialogue").value;
+    const lang =  qs("input[name=font]:checked").value;
 
     // Draw Layers
     for(let i = 0; i < layers.length; i++) {
       let layer = layers[i];
-      drawImageFromContext(ctx, canvas.width / 2, canvas.height / 2, layer)
+      drawImageWithData(ctx, canvas.width / 2, canvas.height / 2, layer)
     }
 
-    // Draw Emotion
-    let emotionName = id("emotion").value;
-    if(emotionName !== "none") {
-      let emotionSide = qs("input[name=emotionside]:checked").value;
-      emotionName += "_" + emotionSide;
-
-      if(!textures[emotionName]) {
-        textures[emotionName] = await loadImage("images/" + emotionName + ".png");
-      }
-
-      const emotion = textures[emotionName];
-      drawImageFromContext(ctx, emotionSide === "l" ? emotionFromSide : canvas.width - emotionFromSide, emotionYPos,
-        {
-          "image": emotion,
-          "offsetX": id("emotionOffsetX").value,
-          "offsetY":id("emotionOffsetY").value,
-          "scale": 1
-        });
-    }
+    await drawEmotion(ctx);
 
     ctx.drawImage(bar, 0, 0);
-
-    if(font !== "en_us") {
-      ctx.drawImage(textures["skip" + font], 0, 0);
+    // If language is not English, we draw the skip button in other language
+    if(lang !== "en_us") {
+      ctx.drawImage(textures["skip" + lang], 0, 0);
     }
 
-    // Calculate text position based on text width
-    let prop = textProperties[font];
-    drawDialogueText(ctx, prop, font, speakerName, dialogue);
+    drawDialogueText(ctx, lang);
 
     // Draw the editor canvas on the smaller preview canvas
-    previewCtx.drawImage(canvas, 0, 0, previewCanvas.width, previewCanvas.height);
+    ctxPreview.drawImage(canvas, 0, 0, preview.width, preview.height);
 
     drawing = false;
   }
 
-  function downloadImage() {
-    // Generate download url
-    this.innerText = textProperties[pageLanguage].loc.generating;
-    id("editor").toBlob(blob => {
-      this.innerText = textProperties[pageLanguage].loc.download;
-      id("downloadLink").href = URL.createObjectURL(blob);
-      id("downloadLink").click();
-    }, "image/png");
-  }
-
-  function printDialogue(text, font, fontSize, startXPos, startYPos, ctx) {
-    let tmp = "";
-    let last = 0;
-    text = text.replace(/\(([^\)]+)\)\{([^\}]+)\}/g, (match, p1, p2, offset, string) => {
-      tmp += text.substring(last, offset);
-
-      // Use normal font size first
-      ctx.font = fontSize + "px dragalialost" + font;
-      // Measure the length so far, add the half of the text below the furigana for the center
-      let center = startXPos + ctx.measureText(tmp).width + ctx.measureText(p1).width / 2;
-
-      // Change to smaller font, measure where to start the furigana
-      ctx.font = furiganaSize + "px dragalialost" + font;
-      let furiXPos = center - ctx.measureText(p2).width / 2;
-
-      //console.log(furiXPos);
-
-      ctx.fillText(p2, furiXPos, startYPos - fontSize + 2);
-
-      tmp += p1;
-      last = offset + p1.length + p2.length + 4;
-      return p1;
-    });
-    ctx.font = fontSize + "px dragalialost" + font;
-    ctx.fillText(text, startXPos, startYPos);
-  }
-
-  function drawImageFromContext(ctx, centerX, centerY, layer) {
+  /**
+   * Draws the image with given data
+   * @param {CanvasRenderingContext2D} ctx - Context of the canvas to draw on
+   * @param {number} centerX - Where to center the image's x position at
+   * @param {number} centerY - Where to center the image y position at
+   * @param {Object} layer - Data of the image
+   */
+  function drawImageWithData(ctx, centerX, centerY, layer) {
+    // Sanitize the data passed in
     scale = parseFloat(layer.scale);
     centerX = parseFloat(centerX);
     centerY = parseFloat(centerY);
@@ -236,38 +182,150 @@
 
     let width = layer.image.naturalWidth * scale;
     let height = layer.image.naturalHeight * scale;
+
     let x = centerX - width / 2 + offsetX;
     let y = centerY - height / 2 + offsetY;
 
-    ctx.translate(centerX+ offsetX, centerY+ offsetY);
+    // Move the context to the pivot before rotating
+    ctx.translate(centerX + offsetX, centerY + offsetY);
     ctx.rotate(rotation * Math.PI / 180);
-    ctx.translate(-centerX- offsetX, -centerY- offsetY);
+    ctx.translate(-centerX - offsetX, -centerY - offsetY);
 
     ctx.drawImage(layer.image, x, y, width, height);
 
-    ctx.translate(centerX+ offsetX, centerY+ offsetY);
+    // Rotate the context back to original rotation
+    ctx.translate(centerX + offsetX, centerY + offsetY);
     ctx.rotate(-rotation * Math.PI / 180);
-    ctx.translate(-centerX- offsetX, -centerY- offsetY);
+    ctx.translate(-centerX - offsetX, -centerY - offsetY);
   }
 
-  function drawDialogueText(ctx, prop, font, speakerName, dialogue) {
-    ctx.font = prop.nameSize + "px dragalialost" + font;
-    ctx.fillStyle = "white";
-    ctx.fillText(speakerName, prop.speakerXPos, prop.speakerYPos);
-    ctx.font = prop.dialogueSize + "px dragalialost" + font;
-    ctx.fillStyle = "#071726";
-    let lines = dialogue.split("\n");
-    for (let i = 0; i < lines.length; i++) {
-      printDialogue(lines[i], font, prop.dialogueSize, prop.dialogueXPos, prop.dialogueYPos + i * prop.lineHeight, ctx);
+  /**
+   * Draws the emotion balloon using context from canvas to draw on
+   * @param {CanvasRenderingContext2D} ctx - Context of the canvas to draw on
+   */
+  async function drawEmotion(ctx) {
+    let emotionName = id("emotion").value;
+    if (emotionName !== "none") {
+      let emotionSide = qs("input[name=emotionside]:checked").value;
+      emotionName += "_" + emotionSide;
+
+      if (!textures[emotionName]) {
+        textures[emotionName] = await loadImage("images/" + emotionName + ".png");
+      }
+
+      const emotion = textures[emotionName];
+      drawImageWithData(ctx,
+        emotionSide === "l" ? emotionFromSide : ctx.canvas.width - emotionFromSide,
+        emotionYPos,
+        {
+          "image": emotion,
+          "offsetX": id("emotionOffsetX").value,
+          "offsetY": id("emotionOffsetY").value,
+          "scale": 1
+        });
     }
   }
 
-  function addLayer(layerName, imageSource) {
-    let tabButton = document.createElement("button");
-    tabButton.innerText = layerName;
+  /**
+   * Draws the dialogue text using context from canvas to draw on
+   * @param {CanvasRenderingContext2D} ctx - Context of the canvas to draw on
+   * @param {string} lang - language of the font to draw with
+   */
+  function drawDialogueText(ctx, lang) {
+    // Get text property and text to draw
+    const prop = i18n[lang];
+    const speakerName = id("name").value;
+    const dialogue = id("dialogue").value;
 
+    ctx.font = `${prop.nameSize}px dragalialost${lang}`;
+
+    // Draw speaker name
+    ctx.fillStyle = "white";
+    ctx.fillText(speakerName, prop.speakerXPos, prop.speakerYPos);
+
+    // Draw dialogue
+    ctx.font = `${prop.dialogueSize}px dragalialost${lang}`;
+    ctx.fillStyle = "#071726";
+    // Draw line by line
+    let lines = dialogue.split("\n");
+    for (let i = 0; i < lines.length; i++) {
+      let x = prop.dialogueXPos;
+      let y = prop.dialogueYPos + i * prop.lineHeight;
+      drawDialogueLine(ctx, lang, lines[i], prop.dialogueSize, x, y);
+    }
+  }
+
+  /**
+   * Draws a line of text starting at the provided position
+   * @param {CanvasRenderingContext2D} ctx - Context of the canvas to draw on
+   * @param {string} lang - Language of the font to draw with
+   * @param {string} text - Text to draw
+   * @param {number} fontSize - Default size of the dialogue text in provided language
+   * @param {number} startX - Starting x position to draw text from
+   * @param {number} startY - Starting y position to draw text from
+   */
+  function drawDialogueLine(ctx, lang, text, fontSize, startX, startY) {
+    let tmp = "";
+    let last = 0;
+    const normalFont = `${fontSize}px dragalialost${lang}`;
+    const furiganaFont = `${furiganaSize}px dragalialost${lang}`;
+
+    // Draw the furigana first by removing them from the line
+    text = text.replace(/\(([^\)]+)\)\{([^\}]+)\}/g, (match, base, furigana, offset, string) => {
+      tmp += text.substring(last, offset);
+
+      // Use normal font size first
+      ctx.font = normalFont;
+      // Measure the length so far, add the half of the text below the furigana for the center
+      let center = startX + ctx.measureText(tmp).width + ctx.measureText(base).width / 2;
+
+      // Change to smaller font, measure where to start the furigana
+      ctx.font = furiganaFont;
+      let furiganaX = center - ctx.measureText(furigana).width / 2;
+      let furiganaY = startY - fontSize + 2;
+      ctx.fillText(furigana, furiganaX, furiganaY);
+
+      tmp += base;
+      last = offset + base.length + furigana.length + 4;
+
+      return base;
+    });
+
+    // Draw text without furigana
+    ctx.font = normalFont;
+    ctx.fillText(text, startX, startY);
+  }
+
+  /**
+   * Generate a download link and click it
+   */
+  async function downloadImage() {
+    this.innerText = i18n[pageLang].loc.generating;
+    const blob = await new Promise(resolve => id("editor").toBlob(resolve, "image/png"));
+    this.innerText = i18n[pageLang].loc.download;
+
+    id("downloadLink").href = URL.createObjectURL(blob);
+    id("downloadLink").click();
+  }
+
+  /**
+   * Add a new layer
+   * @param {string} layerName - Name of the new layer to add
+   * @param {string} imgSrc - Image source for the new layer
+   */
+  function addLayer(layerName, imgSrc) {
+    // Get a new id
+    const layerId = getNewId();
+    // Create tab button
+    let tabButton = document.createElement("li");
+    tabButton.innerText = layerName;
+    tabButton.dataset.layerId = layerId;
+    tabButton.draggable = true;
+    tabButton.addEventListener("dragstart", () => { tabButton.classList.add("dragging") });
+    tabButton.addEventListener("dragend", () => { tabButton.classList.remove("dragging"); reorderLayer(tabButton) });
+    // Create data for new layer
     let newLayer = {
-      "id": getNewId(),
+      "id": layerId,
       "image": null,
       "offsetX": 0,
       "offsetY": 0,
@@ -275,48 +333,159 @@
       "scale": 1,
     }
 
-    let tab = createLayerTab(newLayer, tabButton, imageSource, textProperties[pageLanguage].loc);
+    // Get a new tab
+    let tab = createLayerTab(newLayer, tabButton, imgSrc);
+
     tabButton.addEventListener("click", function() {
-      qsa("#tabBar button").forEach(e => e.classList.remove("active"));
+      qsa("#tabBar li").forEach(e => e.classList.remove("active"));
       qsa(".tab").forEach(e => e.classList.remove("active"));
       this.classList.add("active");
       tab.classList.add("active");
       resetPanels();
     });
 
-    qsa("#tabBar button").forEach(e => e.classList.remove("active"));
+    // Set new tab to active
+    qsa("#tabBar li").forEach(e => e.classList.remove("active"));
     qsa(".tab").forEach(e => e.classList.remove("active"));
     tabButton.classList.add("active");
     tab.classList.add("active");
 
+    // Add tab to DOM
     id("tabBar").insertBefore(tabButton, id("addLayer"));
     id("tabs").appendChild(tab);
 
     layers.push(newLayer);
   }
 
+  /**
+   * Remove the layer that is set to be removed
+   */
   function removeLayer() {
-    const index = array.indexOf(5);
+
+    const index = layers.findIndex(e => e.id === layerToRemove.id);
+
     if (index > -1) {
-      array.splice(index, 1);
+      layers.splice(index, 1);
+    }
+
+    if(layerToRemove.tabButton) {
+      layerToRemove.tabButton.remove();
+    }
+
+    if(layerToRemove.tab) {
+      layerToRemove.tab.remove();
+    }
+
+    qs("#tabBar li").click();
+    drawDialogueScreen();
+    closeLayerDeletePrompt();
+  }
+
+  /**
+   * Generate a new id to associate with a new layer
+   * @returns {number} A new number id
+   */
+  function getNewId() {
+    layerId++;
+    return layerId;
+  }
+
+  function tabDragOver(e) {
+    e.preventDefault();
+    const after = getDragAfterElement(e.clientX, e.clientY);
+    const tab = qs(".dragging");
+    if(after == null) {
+      id("tabBar").insertBefore(tab, id("addLayer"));
+    } else {
+      id("tabBar").insertBefore(tab, after);
     }
   }
 
-  // Should I be sensible and use frameworks like react/vue? yeah probably
-  function createLayerTab(layer, tabButton, imageSource, loc) {
+  function getDragAfterElement(x, y) {
+    const tabs = [...qsa("#tabBar li:not(#addLayer, .dragging)")];
+
+    let after = null;
+    let afterRightMost = -1;
+    let minXOffset = Number.POSITIVE_INFINITY;
+    let minYOffset = Number.POSITIVE_INFINITY;
+    let maxBoxY = 0;
+    let maxBoxX = 0;
+
+    for(let i = 0; i < tabs.length; i++) {
+      const box = tabs[i].getBoundingClientRect();
+      const boxY = box.top + box.height / 2;
+      if(boxY > maxBoxY) {
+        maxBoxY = boxY;
+      }
+    }
+
+    for(let i = 0; i < tabs.length; i++) {
+      const tab = tabs[i];
+      const box = tab.getBoundingClientRect();
+      const offsetX = x - (box.right - box.width / 2);
+      const offsetY = y - box.bottom;
+
+      // The tab is on the row if the mouse is above the row
+      const activeRow = offsetY < 0 && -offsetY <= minYOffset
+      if(activeRow) {
+        minYOffset = Math.abs(offsetY);
+
+        if(offsetX < 0) {
+          if(-offsetX < minXOffset) {
+            after = tab;
+            minXOffset = -offsetX;
+          }
+        }
+        else if(box.right > maxBoxX) {
+          maxBoxX = box.right;
+          afterRightMost = i + 1;
+        }
+      }
+    }
+
+    if(after === null && afterRightMost >= 0 && afterRightMost < tabs.length - 1) {
+      after = tabs[afterRightMost];
+    }
+
+    return after;
+  }
+
+  function reorderLayer(tab) {
+    // Get the tabs
+    const tabs = [...qsa("#tabBar li:not(#addLayer)")];
+    if(tabs.length !== layers.length) { return; }
+
+    let oldIndex = indexOfLayer(tab.dataset.layerId);
+    let newIndex = tabs.indexOf(tab);
+    if(oldIndex === -1 || newIndex === -1) {
+      console.error(`Cannot move tab from index ${oldIndex} to ${newIndex}`);
+      return;
+    }
+    layers.splice(newIndex, 0, layers.splice(oldIndex, 1)[0]);
+    drawDialogueScreen();
+  }
+
+  function indexOfLayer(layerId) {
+    let match = parseInt(layerId);
+    return layers.findIndex(x => x.id === match);
+  }
+
+  function createLayerTab(layer, tabButton, imgSrc) {
+
+    // Get localization data
+    let loc = i18n[pageLang].loc;
+
+    // Create main container
     let tab = document.createElement("div");
     tab.classList.add("tab");
 
     // Create the left part of the tab
     let imageContainer = document.createElement("div");
-
-    imageContainer.innerHTML =
-      `<h2>${loc.layerImage}</h2>
-      <label>${loc.reccomendedSize}</label>`
+    imageContainer.innerHTML = `<h2>${loc.layerImage}</h2><label>${loc.reccomendedSize}</label>`
 
     let image = document.createElement("img");
-    image.src = imageSource;
-    image.alt = `Image for ${tabButton.innerText}`;
+    image.src = imgSrc;
+    image.alt = "Layer Image";
     image.addEventListener("load", drawDialogueScreen);
 
     // Set the image of the layer
@@ -338,18 +507,9 @@
         }, 1000);
         return;
       }
-
-      deleteConfirmBtn.addEventListener("click", () => {
-        const index = layers.findIndex(e => e.id === layer.id);
-        if (index > -1) {
-          layers.splice(index, 1);
-        }
-        tabButton.remove();
-        tab.remove();
-        qs("#tabBar button").click();
-        drawDialogueScreen();
-        closeLayerDeletePrompt();
-      });
+      layerToRemove.id = layer.id;
+      layerToRemove.tabButton = tabButton;
+      layerToRemove.tab = tab;
 
       openLayerDeleteModal();
     });
@@ -367,6 +527,7 @@
 
     let layerNameContainer = document.createElement("div");
     let layerLabel = document.createElement("label");
+
     let layerNameInput = document.createElement("input");
 
     layerNameInput.addEventListener("input", function() {
@@ -435,17 +596,10 @@
     container.appendChild(label);
     container.appendChild(group);
 
-    slider.addEventListener("input", () => { numInput.value = slider.value; });
-    slider.addEventListener("change", () => { numInput.dispatchEvent(new Event('change')); });
-    numInput.addEventListener("input", () => { slider.value = numInput.value });
+    syncSliderWithInput(slider, numInput);
     numInput.addEventListener("change", function() { callback(parseFloat(this.value)) });
 
     return container;
-  }
-
-  function getNewId() {
-    layerId++;
-    return layerId;
   }
 
   /* Layer Delete Modal */
@@ -468,18 +622,12 @@
     id("mouthExpression").innerHTML = "";
     qsa(".tab .portrait-button").forEach(e => e.classList.remove("selected"));
     qsa(".tab .bg-button").forEach(e => e.classList.remove("selected"));
-    currentPortraitData =
-    {
-      "base": "",
-      "offset": {"x": 0, "y": 0},
-      "face": "",
-      "mouth": "",
-    }
+    resetPortraitData();
   }
 
   function bgPanelToggleButton() {
     let button = document.createElement("button");
-    button.innerText = textProperties[pageLanguage].loc.fromBackground;
+    button.innerText = i18n[pageLang].loc.fromBackground;
     button.classList.add("button");
     button.classList.add("bg-button");
     button.addEventListener("click", toggleBackgroundPanel);
@@ -549,16 +697,7 @@
       if(data.index < 0) {
         data.index = 0;
       }
-      for(let i = 0; i < size; i++) {
-        if(i + data.index < data.imgs.length) {
-          bgs[i].src = `https://dragalialost.wiki/thumb.php?f=${data.imgs[i + data.index].fileName}&width=75`;
-          bgs[i].dataset.fullSrc = data.imgs[i + data.index].url;
-          bgs[i].classList.remove("hidden");
-        }
-        else {
-          bgs[i].classList.add("hidden");
-        }
-      }
+      updateBackgroundImages(bgs, data);
     });
 
     next.addEventListener("click", () => {
@@ -566,16 +705,7 @@
         return;
       }
       data.index += size;
-      for(let i = 0; i < size; i++) {
-        if(i + data.index < data.imgs.length) {
-          bgs[i].src = `https://dragalialost.wiki/thumb.php?f=${data.imgs[i + data.index].fileName}&width=75`;
-          bgs[i].dataset.fullSrc = data.imgs[i + data.index].url;
-          bgs[i].classList.remove("hidden");
-        }
-        else {
-          bgs[i].classList.add("hidden");
-        }
-      }
+      updateBackgroundImages(bgs, data);
     });
 
     container.appendChild(prev);
@@ -583,11 +713,25 @@
     container.appendChild(next);
   }
 
+  function updateBackgroundImages(bgs, data) {
+    for(let i = 0; i < bgs.length; i++) {
+      let imgIndex = i + data.index;
+      if(imgIndex < data.imgs.length) {
+        bgs[i].src = THUMB_URL + data.imgs[imgIndex].fileName;
+        bgs[i].dataset.fullSrc = data.imgs[imgIndex].url;
+        bgs[i].classList.remove("hidden");
+      }
+      else {
+        bgs[i].classList.add("hidden");
+      }
+    }
+  }
+
   /* Portrait Panel */
 
   function portraitPanelToggleButton() {
     let button = document.createElement("button");
-    button.innerText = textProperties[pageLanguage].loc.fromPortrait;
+    button.innerText = i18n[pageLang].loc.fromPortrait;
     button.addEventListener("click", togglePortraitPanel);
     button.classList.add("button");
     button.classList.add("portrait-button");
@@ -607,11 +751,11 @@
   }
 
   async function populatePortraitData() {
-    let portraitData = await fetchJson("https://dlportraits.space/portrait_output/localizedDirData.json");
+    let portraitData = await fetchJson(PORTRAIT_URL + "portrait_output/localizedDirData.json");
     let datalist = id("portraitList");
     for(file in portraitData.fileList) {
       let option = document.createElement("option");
-      option.value = portraitData.fileList[file][pageLanguage];
+      option.value = portraitData.fileList[file][pageLang];
       option.dataset.id = file;
       datalist.appendChild(option);
     }
@@ -629,12 +773,12 @@
   }
 
   async function loadSelectedPortraitData(portraitId) {
-    let data = await fetchJson(`https://dlportraits.space/portrait_output/${portraitId}/data.json`);
+    let data = await fetchJson(PORTRAIT_URL + `portrait_output/${portraitId}/data.json`);
 
     let faceContainer = id("facialExpression");
     faceContainer.innerHTML = "";
     for(let i = 0; i < data.partsData.faceParts.length; i++) {
-      let facePartUrl = `https://dlportraits.space/${data.partsData.faceParts[i].substring(2)}`;
+      let facePartUrl = PORTRAIT_URL + data.partsData.faceParts[i].substring(2);
       let facePart = document.createElement("img");
       facePart.src = facePartUrl;
       facePart.addEventListener("click", function() {
@@ -647,7 +791,7 @@
     let mouthContainer = id("mouthExpression");
     mouthContainer.innerHTML = "";
     for(let i = 0; i < data.partsData.mouthParts.length; i++) {
-      let mouthPartUrl = `https://dlportraits.space/${data.partsData.mouthParts[i].substring(2)}`;
+      let mouthPartUrl = PORTRAIT_URL + data.partsData.mouthParts[i].substring(2);
       let mouthPart = document.createElement("img");
       mouthPart.src = mouthPartUrl;
       mouthPart.addEventListener("click", function() {
@@ -659,7 +803,7 @@
 
     currentPortraitData.face = "";
     currentPortraitData.mouth = "";
-    currentPortraitData.base = `https://dlportraits.space/portrait_output/${portraitId}/${portraitId}_base.png`;
+    currentPortraitData.base = PORTRAIT_URL + `portrait_output/${portraitId}/${portraitId}_base.png`;
     currentPortraitData.offset = data.offset;
 
     drawPortraitAndRender();
@@ -689,18 +833,38 @@
 
   /* Helper functions */
 
+  /**
+   * Shorthand for document.getElementById
+   * @param {string} elementId - id of the element to get
+   * @returns {Element} - element with the id
+   */
   function id(elementId) {
     return document.getElementById(elementId);
   }
 
+  /**
+   * Shorthand for document.querySelector
+   * @param {string} selector - selector of the element to get
+   * @returns {Element} - first element matching the selector
+   */
   function qs(selector) {
     return document.querySelector(selector);
   }
 
+  /**
+   * Shorthand for document.querySelectorAll
+   * @param {string} selector - selector of the elements to get
+   * @returns {NodeList} - element that matches at least one of the specified selectors
+   */
   function qsa(selector) {
     return document.querySelectorAll(selector);
   }
 
+  /**
+   * Returns the JSON object from the response of a request to the URL
+   * @param {string} url - url to fetch from
+   * @returns {Object} JSON object fron response
+   */
   async function fetchJson(url) {
     try {
       let response = await fetch(url);
@@ -715,6 +879,11 @@
     }
   }
 
+  /**
+   * Creates and returns the image element with given souce
+   * @param {string} src - source of the image
+   * @returns {Promise} - resolves to the image element if the image loads successfully
+   */
   function loadImage(src){
     let img = new Image();
     img.crossOrigin = "anonymous";
@@ -723,6 +892,18 @@
       img.onload = () => resolve(img);
       img.onerror = reject;
     });
+  }
+
+  /**
+   * Sync the value of a slider to an input that will trigger an event
+   * @param {HTMLInputElement} slider - slider to sync with the input
+   * @param {HTMLInputElement} input - input to sync with the slider
+   */
+  function syncSliderWithInput(slider, input) {
+    slider.addEventListener("input",  function() { input.value = this.value; });
+    // Dispatch a change event to the input, triggering event listener listening for the 'change' event
+    slider.addEventListener("change", function() { input.dispatchEvent(new Event('change')); });
+    input.addEventListener("input",   function() { slider.value = this.value });
   }
 
 })();

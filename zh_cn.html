@@ -13,6 +13,14 @@
   <link href="https://fonts.googleapis.com/css2?family=Lato&amp;family=Noto+Serif:ital@0;1&amp;display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@900&display=swap" rel="stylesheet">
   <link href="style.css" rel="stylesheet">
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-EW9CVRRCX4"></script>
+  <script>
+	window.dataLayer = window.dataLayer || [];
+	function gtag(){dataLayer.push(arguments);}
+	gtag('js', new Date());
+	gtag('config', 'G-EW9CVRRCX4');
+  </script>
   <script src="main.js"></script>
   <title>龙约对话画面生成器</title>
 </head>
@@ -22,9 +30,9 @@
   <section>
       <div id="uploadArea" class="settings">
 
-        <div id="tabBar" class="tab-bar">
-          <button id="addLayer">+</button>
-        </div>
+        <ul id="tabBar" class="tab-bar">
+          <li id="addLayer">+</li>
+        </ul>
 
         <div id="tabs">
         <!-- <div class="tab active">
