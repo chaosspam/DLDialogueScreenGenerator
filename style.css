@@ -205,6 +205,7 @@ section {
 
 .settings input ~ label {
   display: inline;
+  margin-right: 1rem;
 }
 
 .settings input[type=number] {

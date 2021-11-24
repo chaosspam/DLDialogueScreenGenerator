@@ -1,11 +1,16 @@
 {
   "en_us": {
-    "nameSize": 30,
+    "bookYPos": 450,
+    "captionSize": 41,
+    "captionYPos": 500,
     "dialogueSize": 32,
-    "speakerXPos": 45,
-    "speakerYPos": 820,
     "dialogueXPos": 75,
     "dialogueYPos": 930,
+    "introNameSize": 75,
+    "introNameYPos": 893,
+    "introTitleSize": 42,
+    "introTitleYPos": 700,
+    "introXPos": 20,
     "lineHeight": 52,
     "loc": {
       "defaultPortraitSrc": "images/adPortrait.png",
@@ -17,6 +22,7 @@
       "layerOffsetY": "Offset Y",
       "layerRotation": "Rotation",
       "layerScale": "Scale",
+      "layerOpacity": "Opacity",
       "auto": "Fit Canvas",
       "noDeleteBaseLayer": "Base layer cannot be removed!",
       "deleteLayerConfirm": "Are you sure you want to delete this layer?",
@@ -28,15 +34,27 @@
       "fromBackground": "Background",
       "fromPortrait": "Portrait",
       "flipX": "Flip X"
-    }
-  },
-  "zh_tw": {
-    "nameSize": 32,
-    "dialogueSize": "900 32",
+    },
+    "nameSize": 30,
+    "narrationLineHeight": 70,
+    "narrationYPos": 450,
     "speakerXPos": 45,
     "speakerYPos": 820,
+    "titleSize": 58,
+    "titleYPos": 405
+  },
+  "zh_tw": {
+    "bookYPos": 450,
+    "captionSize": 41,
+    "captionYPos": 500,
+    "dialogueSize": "900 32",
     "dialogueXPos": 75,
     "dialogueYPos": 930,
+    "introNameSize": 75,
+    "introNameYPos": 893,
+    "introTitleSize": 42,
+    "introTitleYPos": 700,
+    "introXPos": 20,
     "lineHeight": 70,
     "loc": {
       "defaultPortraitSrc": "images/examplePortrait.png",
@@ -48,6 +66,7 @@
       "layerOffsetY": "上下調整",
       "layerRotation": "旋轉",
       "layerScale": "放大/縮小",
+      "layerOpacity": "不透明度",
       "auto": "符合畫面",
       "noDeleteBaseLayer": "無法刪除基底圖層!",
       "deleteLayerConfirm": "確定刪除此圖層?",
@@ -59,15 +78,27 @@
       "fromBackground": "背景",
       "fromPortrait": "美術圖",
       "flipX": "水平翻轉"
-    }
-  },
-  "zh_cn": {
-    "nameSize": "900 32",
-    "dialogueSize": "900 32",
+    },
+    "nameSize": 32,
+    "narrationLineHeight": 70,
+    "narrationYPos": 450,
     "speakerXPos": 45,
     "speakerYPos": 820,
+    "titleSize": 58,
+    "titleYPos": 405
+  },
+  "zh_cn": {
+    "bookYPos": 450,
+    "captionSize": 41,
+    "captionYPos": 500,
+    "dialogueSize": "900 32",
     "dialogueXPos": 75,
     "dialogueYPos": 930,
+    "introNameSize": 75,
+    "introNameYPos": 893,
+    "introTitleSize": 42,
+    "introTitleYPos": 700,
+    "introXPos": 20,
     "lineHeight": 70,
     "loc": {
       "defaultPortraitSrc": "images/examplePortrait.png",
@@ -79,6 +110,7 @@
       "layerOffsetY": "上下调整",
       "layerRotation": "旋转",
       "layerScale": "放大/缩小",
+      "layerOpacity": "不透明度",
       "auto": "符合画面",
       "noDeleteBaseLayer": "无法删除基底图层!",
       "deleteLayerConfirm": "确定删除此图层?",
@@ -90,15 +122,27 @@
       "fromBackground": "背景",
       "fromPortrait": "美术图",
       "flipX": "水平翻转"
-    }
+    },
+    "nameSize": 32,
+    "narrationLineHeight": 70,
+    "narrationYPos": 450,
+    "speakerXPos": 45,
+    "speakerYPos": 820,
+    "titleSize": 58,
+    "titleYPos": 405
   },
   "jp": {
-    "nameSize": 32,
+    "bookYPos": 450,
+    "captionSize": 41,
+    "captionYPos": 500,
     "dialogueSize": 32,
-    "speakerXPos": 45,
-    "speakerYPos": 825,
     "dialogueXPos": 75,
     "dialogueYPos": 945,
+    "introNameSize": 75,
+    "introNameYPos": 893,
+    "introTitleSize": 42,
+    "introTitleYPos": 700,
+    "introXPos": 20,
     "lineHeight": 52,
     "loc": {
       "defaultPortraitSrc": "images/examplePortrait.png",
@@ -110,6 +154,7 @@
       "layerOffsetY": "上下位置調整",
       "layerRotation": "回転",
       "layerScale": "拡大・縮小",
+      "layerOpacity": "不透明度",
       "auto": "画面に合う",
       "noDeleteBaseLayer": "ベースレイヤーは削除できません!",
       "deleteLayer": "レイヤーを削除",
@@ -120,6 +165,13 @@
       "fromBackground": "背景",
       "fromPortrait": "イラスト",
       "flipX": "左右反転"
-    }
+    },
+    "nameSize": 32,
+    "narrationLineHeight": 70,
+    "narrationYPos": 450,
+    "speakerXPos": 45,
+    "speakerYPos": 825,
+    "titleSize": 58,
+    "titleYPos": 405
   }
 }

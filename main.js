@@ -111,11 +111,18 @@
   }
 
   async function loadTextures() {
-    if(!textures.background) {
+    if(!textures.loaded) {
       textures.bar = await loadImage("images/bar.png");
+      textures.caption = await loadImage("images/caption.png");
+      textures.book = await loadImage("images/book.png");
+      textures.fullscreen = await loadImage("images/fullscreen.png");
+      textures.introBack = await loadImage("images/introBack.png");
+      textures.introBar = await loadImage("images/introBar.png");
       textures.skipjp = await loadImage("images/skipjp.png");
       textures.skipzh_tw = await loadImage("images/skipcn.png");
       textures.skipzh_cn = await loadImage("images/skipcn.png");
+      textures.skipen_us = await loadImage("images/skipen_us.png");
+      textures.loaded = true;
     }
   }
 
@@ -133,19 +140,38 @@
     const ctx = canvas.getContext("2d");
     const ctxPreview = preview.getContext("2d");
 
+    // Get draw type
+    const dialogueType = qs("input[name=stdialogue]:checked").value;
+    const lang =  qs("input[name=font]:checked").value;
+
     // Clear the canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctxPreview.clearRect(0, 0, preview.width, preview.height);
 
     // Load images for use
     await loadTextures();
-    const bar = textures.bar;
-    const lang =  qs("input[name=font]:checked").value;
+
+    let bar = textures.bar;
+
+    if(dialogueType === "intro") {
+      bar = textures.introBar;
+      ctx.drawImage(textures.introBack, 0, 0);
+    }
+    if(dialogueType === "caption" || dialogueType === "narration") {
+      bar = textures.caption;
+    }
+    if(dialogueType === "full") {
+      bar = textures.fullscreen;
+    }
+    if(dialogueType === "book") {
+      ctx.drawImage(textures.book, 0, 0);
+      bar = textures["skip" + lang];
+    }
 
     // Draw Layers
     for(let i = 0; i < layers.length; i++) {
       let layer = layers[i];
-      drawImageWithData(ctx, canvas.width / 2, canvas.height / 2, layer)
+      drawImageWithData(ctx, canvas.width / 2, canvas.height / 2, layer, dialogueType === "intro")
     }
 
     await drawEmotion(ctx);
@@ -156,7 +182,7 @@
       ctx.drawImage(textures["skip" + lang], 0, 0);
     }
 
-    drawDialogueText(ctx, lang);
+    drawDialogueText(dialogueType, ctx, lang);
 
     // Draw the editor canvas on the smaller preview canvas
     ctxPreview.drawImage(canvas, 0, 0, preview.width, preview.height);
@@ -171,7 +197,7 @@
    * @param {number} centerY - Where to center the image y position at
    * @param {Object} layer - Data of the image
    */
-  function drawImageWithData(ctx, centerX, centerY, layer) {
+  function drawImageWithData(ctx, centerX, centerY, layer, dropShadow = false) {
     // Sanitize the data passed in
     scale = parseFloat(layer.scale);
     centerX = parseFloat(centerX);
@@ -199,6 +225,14 @@
     if(rotation !== 0) {
       ctx.rotate(rotation * Math.PI / 180);
     }
+
+    if(dropShadow) {
+      ctx.shadowColor = 'rgba(0, 0, 0, .25)';
+      ctx.shadowOffsetX = 20;
+      ctx.shadowOffsetY = 20;
+    }
+
+    ctx.globalAlpha = layer.opacity;
 
     ctx.translate(-centerX - offsetX, -centerY - offsetY);
 
@@ -240,27 +274,76 @@
    * @param {CanvasRenderingContext2D} ctx - Context of the canvas to draw on
    * @param {string} lang - language of the font to draw with
    */
-  function drawDialogueText(ctx, lang) {
+  function drawDialogueText(dialogueType, ctx, lang) {
     // Get text property and text to draw
     const prop = i18n[lang];
     const speakerName = id("name").value;
     const dialogue = id("dialogue").value;
 
-    ctx.font = `${prop.nameSize}px dragalialost${lang}`;
-
     // Draw speaker name
+    ctx.textAlign = "left";
+
+    ctx.font = `${prop.nameSize}px dragalialost${lang}`;
     ctx.fillStyle = "white";
-    ctx.fillText(speakerName, prop.speakerXPos, prop.speakerYPos);
+
+    if(dialogueType === "caption") {
+      ctx.font = `${prop.titleSize}px dragalialost${lang}`;
+      ctx.fillText(speakerName, (ctx.canvas.width - ctx.measureText(speakerName).width) / 2, prop.titleYPos);
+      ctx.fillRect(0, 430, ctx.canvas.width, 1);
+    } else if (dialogueType === "intro") {
+      drawSpeakerNameIntro(ctx, prop, lang, speakerName);
+    } else if(dialogueType !== "narration" && dialogueType !== "full" && dialogueType !== "book") {
+      ctx.fillText(speakerName, prop.speakerXPos, prop.speakerYPos);
+    }
 
     // Draw dialogue
-    ctx.font = `${prop.dialogueSize}px dragalialost${lang}`;
-    ctx.fillStyle = "#071726";
-    // Draw line by line
     let lines = dialogue.split("\n");
+
+    let fontSize = prop.dialogueSize;
+    let lineHeight = prop.lineHeight;
+
+    let startX = prop.dialogueXPos;
+    let startY = prop.dialogueYPos;
+
+    ctx.fillStyle = "#071726";
+
+    if(dialogueType === "intro") {
+      drawTitleIntro(ctx, prop, lang, dialogue);
+      return;
+    }
+
+    let center = false;
+
+    if(dialogueType === "caption") {
+      startY = prop.captionYPos;
+      ctx.fillStyle = "white";
+      fontSize = prop.captionSize;
+      center = true;
+    } else if(dialogueType === "narration" || dialogueType === "full") {
+      fontSize = prop.dialogueSize;
+      lineHeight = prop.narrationLineHeight;
+      startY = prop.narrationYPos - (fontSize + (lines.length - 1) * lineHeight) / 2;
+      ctx.fillStyle = "white";
+      center = true;
+    } else if(dialogueType === "book") {
+      fontSize = prop.dialogueSize;
+      lineHeight = prop.narrationLineHeight;
+      startY = ctx.canvas.height / 2 - ((lines.length - 1) * lineHeight) / 2;
+      ctx.fillStyle = "#412c29";
+      center = true;
+    }
+
+    ctx.font = `${fontSize}px dragalialost${lang}`;
+
+    // Draw line by line
     for (let i = 0; i < lines.length; i++) {
-      let x = prop.dialogueXPos;
-      let y = prop.dialogueYPos + i * prop.lineHeight;
-      drawDialogueLine(ctx, lang, lines[i], prop.dialogueSize, x, y);
+      let x = startX;
+      if(center) {
+        let base = lines[i].replace(/\(([^\)]+)\)\{([^\}]+)\}/g, (match, base, furigana, offset, string) => base);
+        x = (ctx.canvas.width - ctx.measureText(base).width) / 2;
+      }
+      let y = startY + i * lineHeight;
+      drawDialogueLine(ctx, lang, lines[i], fontSize, x, y);
     }
   }
 
@@ -306,6 +389,57 @@
   }
 
   /**
+   * Draws the speaker's name slanted for intro
+   * @param {CanvasRenderingContext2D} ctx
+   * @param {Object} prop - property of the text
+   * @param {string} lang - Language of the font to draw with
+   * @param {string} speakerName - Text to draw
+   */
+  function drawSpeakerNameIntro(ctx, prop, lang, speakerName) {
+    ctx.save();
+
+    ctx.font = `${prop.introNameSize}px dragalialost${lang}`;
+    let textWidth = ctx.measureText(speakerName).width;
+
+    let x = ctx.canvas.width;
+    ctx.translate(x, prop.introNameYPos);
+    ctx.rotate(-6.25 * Math.PI / 180);
+    ctx.translate(-x, -prop.introNameYPos);
+
+    ctx.strokeStyle = "#333333";
+    ctx.lineWidth = 8;
+    ctx.miterLimit = 2;
+    ctx.strokeText(speakerName, ctx.canvas.width - textWidth - prop.introXPos, prop.introNameYPos);
+    ctx.fillText(speakerName, ctx.canvas.width - textWidth - prop.introXPos, prop.introNameYPos);
+
+    ctx.restore();
+  }
+
+  /**
+   * Draws the speaker's name slanted for intro
+   * @param {CanvasRenderingContext2D} ctx
+   * @param {Object} prop - property of the text
+   * @param {string} lang - Language of the font to draw with
+   * @param {string} speakerName - Text to draw
+   */
+  function drawTitleIntro(ctx, prop, lang, text) {
+    ctx.save();
+
+    ctx.font = `${prop.introTitleSize}px dragalialost${lang}`;
+    let textWidth = ctx.measureText(text).width;
+
+    let x = ctx.canvas.width;
+    ctx.translate(x, prop.introTitleYPos);
+    ctx.rotate(-6.25 * Math.PI / 180);
+    ctx.translate(-x, -prop.introTitleYPos);
+
+    ctx.fillStyle = "#333333";
+    ctx.fillText(text, ctx.canvas.width - textWidth - prop.introXPos, prop.introTitleYPos);
+
+    ctx.restore();
+  }
+
+  /**
    * Generate a download link and click it
    */
   async function downloadImage() {
@@ -314,6 +448,7 @@
     this.innerText = i18n[pageLang].loc.download;
 
     id("downloadLink").href = URL.createObjectURL(blob);
+    id("downloadLink").download = `${id("name").value.toLowerCase()}_dialogue_screen.png`;
     id("downloadLink").click();
   }
 
@@ -344,6 +479,7 @@
       "offsetY": 0,
       "rotation": 0,
       "scale": 1,
+      "opacity": 1,
       "flipX": false
     }
 
@@ -598,22 +734,12 @@
     layerNameContainer.appendChild(layerNameInput);
 
     settingContainer.appendChild(layerNameContainer);
+    settingContainer.appendChild(createSliderGroup(loc.layerOpacity, 0, 1, 0.01, 1, (value) => { layer.opacity = value; drawDialogueScreen(); }));
     settingContainer.appendChild(createSliderGroup(loc.layerOffsetX, -400, 400, 1, 0, (value) => { layer.offsetX = value; drawDialogueScreen(); }));
     settingContainer.appendChild(createSliderGroup(loc.layerOffsetY, -400, 400, 1, 0, (value) => { layer.offsetY = value; drawDialogueScreen(); }));
     settingContainer.appendChild(createSliderGroup(loc.layerRotation, -180, 180, 0.1, 0, (value) => { layer.rotation = value; drawDialogueScreen(); }));
     let scaleSliderGroup = createSliderGroup(loc.layerScale, 0, 3, 0.1, 1, (value) => { layer.scale = value; drawDialogueScreen(); });
 
-    let flipXContainer = document.createElement("div");
-    let flipXLabel = document.createElement("label");
-
-    flipXLabel.innerText = loc.flipX;
-    let flipX = document.createElement("input");
-    flipX.type = "checkbox";
-    flipX.addEventListener("change", function(){ layer.flipX = this.checked; drawDialogueScreen(); });
-    flipXContainer.appendChild(flipXLabel);
-    flipXContainer.appendChild(flipX);
-
-    settingContainer.appendChild(flipXContainer);
 
     let autoButton = document.createElement("button");
     autoButton.classList.add("button");
@@ -625,6 +751,14 @@
       numInput.value = newScale;
       numInput.dispatchEvent(new Event('change'));
     });
+
+    let flipXLabel = document.createElement("label");
+    flipXLabel.innerText = loc.flipX;
+    let flipX = document.createElement("input");
+    flipX.type = "checkbox";
+    flipX.addEventListener("change", function(){ layer.flipX = this.checked; drawDialogueScreen(); });
+    scaleSliderGroup.appendChild(flipX);
+    scaleSliderGroup.appendChild(flipXLabel);
 
     scaleSliderGroup.appendChild(autoButton);
 
