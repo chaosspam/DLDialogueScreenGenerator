@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en_us">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -33,7 +33,7 @@
 </head>
 <body>
   <h1>Dragalia Lost Dialogue Screen Generator</h1>
-  <canvas id="preview" width="250px" height="445px"></canvas>
+  <canvas id="preview" width="250" height="445"></canvas>
   <section>
       <div id="uploadArea" class="settings">
 
@@ -141,36 +141,36 @@
 
         <div>
           <label>Dialogue Text</label>
-          <textarea name="" id="dialogue" cols="45" rows="5">Hey there!&#13;&#10;Enjoying the Dialogue Screen Generator?&#13;&#10;If you want to support this project,&#13;&#10;Please consider buying Chao's new game!</textarea>
+          <textarea id="dialogue" cols="45" rows="5">Hey there!&#13;&#10;Enjoying the Dialogue Screen Generator?&#13;&#10;If you want to support this project,&#13;&#10;Please consider buying Chao's new game!</textarea>
         </div>
 
         <div>
           <label>Type</label>
-          <input type="radio" autocomplete="off" name="stdialogue" value="dialogue" checked>
-          <label>Dialogue</label>
-          <input type="radio" autocomplete="off" name="stdialogue" value="intro">
-          <label>Intro</label>
-          <input type="radio" autocomplete="off" name="stdialogue" value="caption">
-          <label>Caption</label>
+          <input type="radio" name="stdialogue" value="dialogue" id="std-dialogue" checked>
+          <label for="std-dialogue">Dialogue</label>
+          <input type="radio" name="stdialogue" value="intro" id="std-intro">
+          <label for="std-intro">Intro</label>
+          <input type="radio" name="stdialogue" value="caption" id="std-caption">
+          <label for="std-caption">Caption</label>
           <br>
-          <input type="radio" autocomplete="off" name="stdialogue" value="full">
-          <label>Full Screen</label>
-          <input type="radio" autocomplete="off" name="stdialogue" value="narration">
-          <label>Narration</label>
-          <input type="radio" autocomplete="off" name="stdialogue" value="book">
-          <label>Book</label>
+          <input type="radio" name="stdialogue" value="full" id="std-full">
+          <label for="std-full">Full Screen</label>
+          <input type="radio" name="stdialogue" value="narration" id="std-narration">
+          <label for="std-narration">Narration</label>
+          <input type="radio" name="stdialogue" value="book" id="std-book">
+          <label for="std-book">Book</label>
         </div>
 
         <div>
           <label>Font</label>
-          <input type="radio" id="en" name="font" value="en_us" checked>
+          <input type="radio" id="en" name="font" value="en" checked>
           <label for="en">English</label>
-          <input type="radio" id="jp" name="font" value="jp">
+          <input type="radio" id="jp" name="font" value="ja">
           <label for="jp">日本語</label>
-          <input type="radio" id="zh_tw" name="font" value="zh_tw">
-          <label for="cn">繁體中文</label>
-          <input type="radio" id="zh_cn" name="font" value="zh_cn">
-          <label for="cn">简体中文</label>
+          <input type="radio" id="zh_tw" name="font" value="zh-Hant">
+          <label for="zh_tw">繁體中文</label>
+          <input type="radio" id="zh_cn" name="font" value="zh-Hans">
+          <label for="zh_cn">简体中文</label>
         </div>
 
         <div>
@@ -221,18 +221,18 @@
 
       </div>
   </section>
-  <canvas id="editor" width="750px" height="1334px" class="hidden"></canvas>
+  <canvas id="editor" width="750" height="1334" class="hidden"></canvas>
   <footer>
     <iframe src="https://store.steampowered.com/widget/1764410/" frameborder="0" height="190" style='width:100%;max-width:646px;'></iframe>
     <p>(Sorry for the shameless self promotion)</p>
     All characters/images belong to Cygames and Nintendo /
     <a href="https://github.com/chaosspam/DLDialogueScreenGenerator">Github</a>
     /
-    <a href="/DLDialogueScreenGenerator/">English</a>
-    <a href="/DLDialogueScreenGenerator/jp.html">日本語</a>
-    <a href="/DLDialogueScreenGenerator/zh_tw.html">繁體中文</a>
-    <a href="/DLDialogueScreenGenerator/zh_cn.html">简体中文</a>
-    <a href='https://ko-fi.com/N4N34N2U2' target='_blank'><img height='36' style='border:0px;height:24px;vertical-align:sub;' src='https://cdn.ko-fi.com/cdn/kofi1.png?v=2' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
+    <a href="index.html">English</a>
+    <a href="jp.html">日本語</a>
+    <a href="zh_tw.html">繁體中文</a>
+    <a href="zh_cn.html">简体中文</a>
+    <a href='https://ko-fi.com/N4N34N2U2' target='_blank'><img height='36' style='border:0px;height:24px;vertical-align:sub;' src='https://cdn.ko-fi.com/cdn/kofi1.png?v=2' alt='Buy Me a Coffee at ko-fi.com' /></a>
   </footer>
   <div id="deletePrompt" class="hidden">
     <div>

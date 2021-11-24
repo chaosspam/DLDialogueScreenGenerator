@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="jp">
+<html lang="ja">
 <head>
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -33,7 +33,7 @@
 </head>
 <body>
   <h1>ドラガリストーリー画面メーカー</h1>
-  <canvas id="preview" width="250px" height="445px"></canvas>
+  <canvas id="preview" width="250" height="445"></canvas>
   <section>
       <div id="uploadArea" class="settings">
 
@@ -141,36 +141,36 @@
 
         <div>
           <label>文章</label>
-          <textarea name="" id="dialogue" cols="45" rows="5">よーし、(夏){なつ}の(思){おも}い(出){で}をたくさん(作){つく}って、&#13;&#10;(絵){え}にしましょう！</textarea>
+          <textarea id="dialogue" cols="45" rows="5">よーし、(夏){なつ}の(思){おも}い(出){で}をたくさん(作){つく}って、&#13;&#10;(絵){え}にしましょう！</textarea>
         </div>
 
         <div>
           <label>タイプ</label>
-          <input type="radio" autocomplete="off" name="stdialogue" value="dialogue" checked>
-          <label>会話</label>
-          <input type="radio" autocomplete="off" name="stdialogue" value="intro">
-          <label>カットイン</label>
-          <input type="radio" autocomplete="off" name="stdialogue" value="caption">
-          <label>タイトル</label>
+          <input type="radio" name="stdialogue" value="dialogue" id="std-dialogue" checked>
+          <label for="std-dialogue">会話</label>
+          <input type="radio" name="stdialogue" value="intro" id="std-intro">
+          <label for="std-intro">カットイン</label>
+          <input type="radio" name="stdialogue" value="caption" id="std-caption">
+          <label for="std-caption">タイトル</label>
           <br>
-          <input type="radio" autocomplete="off" name="stdialogue" value="full">
-          <label>フルアート</label>
-          <input type="radio" autocomplete="off" name="stdialogue" value="narration">
-          <label>ナレーション</label>
-          <input type="radio" autocomplete="off" name="stdialogue" value="book">
-          <label>本</label>
+          <input type="radio" name="stdialogue" value="full" id="std-full">
+          <label for="std-full">フルアート</label>
+          <input type="radio" name="stdialogue" value="narration" id="std-narration">
+          <label for="std-narration">ナレーション</label>
+          <input type="radio" name="stdialogue" value="book" id="std-book">
+          <label for="std-book">本</label>
         </div>
 
         <div>
           <label>フォント</label>
           <input type="radio" id="en" name="font" value="en">
           <label for="en">English</label>
-          <input type="radio" id="jp" name="font" value="jp" checked>
+          <input type="radio" id="jp" name="font" value="ja" checked>
           <label for="jp">日本語</label>
-          <input type="radio" id="zh_tw" name="font" value="zh_tw">
-          <label for="cn">繁體中文</label>
-          <input type="radio" id="zh_cn" name="font" value="zh_cn">
-          <label for="cn">简体中文</label>
+          <input type="radio" id="zh_tw" name="font" value="zh-Hant">
+          <label for="zh_tw">繁體中文</label>
+          <input type="radio" id="zh_cn" name="font" value="zh-Hans">
+          <label for="zh_cn">简体中文</label>
         </div>
 
         <div>
@@ -221,16 +221,16 @@
 
       </div>
   </section>
-  <canvas id="editor" width="750px" height="1334px" class="hidden"></canvas>
+  <canvas id="editor" width="750" height="1334" class="hidden"></canvas>
   <footer>
     当サイトに記載されている写真・イラストの著作権はCygames/任天堂に帰属します /
     <a href="https://github.com/chaosspam/DLDialogueScreenGenerator">Github</a>
     /
-    <a href="/DLDialogueScreenGenerator/">English</a>
-    <a href="/DLDialogueScreenGenerator/jp.html">日本語</a>
-    <a href="/DLDialogueScreenGenerator/zh_tw.html">繁體中文</a>
-    <a href="/DLDialogueScreenGenerator/zh_cn.html">简体中文</a>
-    <a href='https://ko-fi.com/N4N34N2U2' target='_blank'><img height='36' style='border:0px;height:24px;vertical-align:sub;' src='https://cdn.ko-fi.com/cdn/kofi1.png?v=2' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
+    <a href="index.html">English</a>
+    <a href="jp.html">日本語</a>
+    <a href="zh_tw.html">繁體中文</a>
+    <a href="zh_cn.html">简体中文</a>
+    <a href='https://ko-fi.com/N4N34N2U2' target='_blank'><img height='36' style='border:0px;height:24px;vertical-align:sub;' src='https://cdn.ko-fi.com/cdn/kofi1.png?v=2' alt='Buy Me a Coffee at ko-fi.com' /></a>
   </footer>
   <div id="deletePrompt" class="hidden">
     <div>

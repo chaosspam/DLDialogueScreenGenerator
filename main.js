@@ -4,7 +4,7 @@
 
   // Localization
   let i18n;
-  let pageLang = "en_us";
+  let pageLang = "en";
 
   // Screen drawing data
   const furiganaSize = 15;
@@ -43,9 +43,9 @@
       addLayer(i18n[pageLang].loc.portrait, i18n[pageLang].loc.defaultPortraitSrc);
       // Wait for fonts to load before drawing
       await document.fonts.load("30px dragalialosten");
-      await document.fonts.load("30px dragalialostjp");
-      await document.fonts.load("30px dragalialostzh_tw");
-      await document.fonts.load("30px dragalialostzh_cn");
+      await document.fonts.load("30px dragalialostja");
+      await document.fonts.load("30px dragalialostzh-Hans");
+      await document.fonts.load("30px dragalialostzh-Hant");
       // Draw dialogue screen
       await drawDialogueScreen();
       // Fetch background and portrait data
@@ -118,10 +118,10 @@
       textures.fullscreen = await loadImage("images/fullscreen.png");
       textures.introBack = await loadImage("images/introBack.png");
       textures.introBar = await loadImage("images/introBar.png");
-      textures.skipjp = await loadImage("images/skipjp.png");
-      textures.skipzh_tw = await loadImage("images/skipcn.png");
-      textures.skipzh_cn = await loadImage("images/skipcn.png");
-      textures.skipen_us = await loadImage("images/skipen_us.png");
+      textures.skipja = await loadImage("images/skipjp.png");
+      textures['skipzh-Hant'] = await loadImage("images/skipcn.png");
+      textures['skipzh-Hans'] = await loadImage("images/skipcn.png");
+      textures.skipen= await loadImage("images/skipen_us.png");
       textures.loaded = true;
     }
   }
@@ -178,7 +178,7 @@
 
     ctx.drawImage(bar, 0, 0);
     // If language is not English, we draw the skip button in other language
-    if(lang !== "en_us") {
+    if(lang !== "en") {
       ctx.drawImage(textures["skip" + lang], 0, 0);
     }
 
