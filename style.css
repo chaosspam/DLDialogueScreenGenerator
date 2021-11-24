@@ -27,6 +27,27 @@
   font-style: normal;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
+#toTop {
+  display: none;
+  position: fixed;
+  width: 40px;
+  height: 40px;
+  background-color: #212529;
+  border-radius: 50%;
+  right: 20px;
+  bottom: 15px;
+  text-align: center;
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 25px;
+  line-height: 38px;
+}
+
 body {
   background-color: #eee;
   color: #434343;
@@ -455,5 +476,21 @@ ul {
 
   section {
     margin-left: 0;
+  }
+
+  body {
+    padding: 0 5px;
+  }
+
+  h1 {
+    text-align: center;
+  }
+
+  .settings input[type=radio] ~ label {
+    margin-right: initial;
+  }
+
+  #toTop {
+    display: block;
   }
 }
