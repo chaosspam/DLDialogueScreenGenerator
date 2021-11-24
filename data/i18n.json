@@ -1,5 +1,5 @@
 {
-  "en_us": {
+  "en": {
     "bookYPos": 450,
     "captionSize": 41,
     "captionYPos": 500,
@@ -43,7 +43,7 @@
     "titleSize": 58,
     "titleYPos": 405
   },
-  "zh_tw": {
+  "zh-Hant": {
     "bookYPos": 450,
     "captionSize": 41,
     "captionYPos": 500,
@@ -87,7 +87,7 @@
     "titleSize": 58,
     "titleYPos": 405
   },
-  "zh_cn": {
+  "zh-Hans": {
     "bookYPos": 450,
     "captionSize": 41,
     "captionYPos": 500,
@@ -131,7 +131,7 @@
     "titleSize": 58,
     "titleYPos": 405
   },
-  "jp": {
+  "ja": {
     "bookYPos": 450,
     "captionSize": 41,
     "captionYPos": 500,
