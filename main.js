@@ -24,7 +24,7 @@
   // Background drawing data
   const THUMB_URL = "https://dragalialost.wiki/thumb.php?width=75&f="
   const backgroundData = {};
-  const backgroundPaginationSize = 12;
+  const bgCarouselSize = 12;
 
   /* Setup */
 
@@ -323,6 +323,10 @@
     tabButton.draggable = true;
     tabButton.addEventListener("dragstart", () => { tabButton.classList.add("dragging") });
     tabButton.addEventListener("dragend", () => { tabButton.classList.remove("dragging"); reorderLayer(tabButton) });
+    // Prevent long tap context menu
+    tabButton.addEventListener("touchstart", (e) => { e.preventDefault(); tabButton.classList.add("dragging");});
+    tabButton.addEventListener("touchend", () => { tabButton.classList.remove("dragging"); reorderLayer(tabButton) });
+    tabButton.addEventListener("touchmove", tabTouchOver);
     // Create data for new layer
     let newLayer = {
       "id": layerId,
@@ -390,6 +394,10 @@
     return layerId;
   }
 
+  /**
+   * Handles
+   * @param {Event} e - mouse event
+   */
   function tabDragOver(e) {
     e.preventDefault();
     const after = getDragAfterElement(e.clientX, e.clientY);
@@ -401,6 +409,28 @@
     }
   }
 
+  /**
+   *
+   * @param {Event} e - touch event
+   */
+  function tabTouchOver(e) {
+    e.preventDefault();
+    let target = e.targetTouches[0];
+    const after = getDragAfterElement(target.pageX, target.pageY);
+    const tab = qs(".dragging");
+    if(after == null) {
+      id("tabBar").insertBefore(tab, id("addLayer"));
+    } else {
+      id("tabBar").insertBefore(tab, after);
+    }
+  }
+
+  /**
+   * Returns the tab to append before based on the position
+   * @param {number} x - x position of the event
+   * @param {number} y - y position of the event
+   * @returns {HTMLLIElement} - tab that comes after the position
+   */
   function getDragAfterElement(x, y) {
     const tabs = [...qsa("#tabBar li:not(#addLayer, .dragging)")];
 
@@ -450,6 +480,10 @@
     return after;
   }
 
+  /**
+   * Reorder the layers based on the document order
+   * @param {HTMLLIElement} tab - tab that is getting repositioned
+   */
   function reorderLayer(tab) {
     // Get the tabs
     const tabs = [...qsa("#tabBar li:not(#addLayer)")];
@@ -465,11 +499,23 @@
     drawDialogueScreen();
   }
 
+  /**
+   * Returns the index of the layer with the given layer id
+   * @param {number} layerId - id of the layer
+   * @returns {number} index of the layer, -1 if not found
+   */
   function indexOfLayer(layerId) {
     let match = parseInt(layerId);
     return layers.findIndex(x => x.id === match);
   }
 
+  /**
+   * Creates and returns a new layer tab
+   * @param {Object} layer - layer the tab represents
+   * @param {HTMLLIElement} tabButton - button that opens that tab
+   * @param {string} imgSrc - src of the image to be used on the new tab
+   * @returns {HTMLDivElement} - new layer tab
+   */
   function createLayerTab(layer, tabButton, imgSrc) {
 
     // Get localization data
@@ -569,6 +615,17 @@
     return tab;
   }
 
+  /**
+   * Creates and returns a slider input group that is labeled and calls the given function when
+   * their value is updated
+   * @param {string} labelText - text of the label
+   * @param {number} min - minimum of the slider/input
+   * @param {number} max - maximum of the slider/input
+   * @param {number} step - step of the slider/input
+   * @param {number} startValue - initial value of the slider/input
+   * @param {function} callback - function that will be called when value of slider/input is changed
+   * @returns
+   */
   function createSliderGroup(labelText, min, max, step, startValue, callback) {
     let container = document.createElement("div");
     let label = document.createElement("label");
@@ -604,16 +661,25 @@
 
   /* Layer Delete Modal */
 
+  /**
+   * Opens the layer delete modal
+   */
   function openLayerDeleteModal() {
     id("deletePrompt").classList.remove("hidden");
   }
 
+  /**
+   * Closes the layer delete modal
+   */
   function closeLayerDeletePrompt() {
     id("deletePrompt").classList.add("hidden");
   }
 
-  /* Background Panel */
+  /* Panels General */
 
+  /**
+   * Resets the portrait and background panel
+   */
   function resetPanels() {
     id("portraitPanel").classList.add("hidden");
     id("backgroundPanel").classList.add("hidden");
@@ -625,6 +691,12 @@
     resetPortraitData();
   }
 
+  /* Background Panel */
+
+  /**
+   * Generate a button that toggles the background panel
+   * @returns {HTMLButtonElement} button that toggles the background panel
+   */
   function bgPanelToggleButton() {
     let button = document.createElement("button");
     button.innerText = i18n[pageLang].loc.fromBackground;
@@ -634,6 +706,9 @@
     return button;
   }
 
+  /**
+   * Toggles the background panel
+   */
   function toggleBackgroundPanel() {
     // Toggle background panel
     let backgroundHidden = id("backgroundPanel").classList.toggle("hidden");
@@ -646,6 +721,9 @@
     }
   }
 
+  /**
+   * Fetches data for the background
+   */
   async function fetchBackgroundImages() {
     let data = await fetchJson("data/background_data.json");
 
@@ -656,14 +734,20 @@
       backgroundData[data[i].type].imgs.push(data[i]);
     }
 
-    createPagination(id("backgroundBackgroundArt"), backgroundData.background, backgroundPaginationSize);
-    createPagination(id("skyboxBackgroundArt"), backgroundData.skybox, backgroundPaginationSize);
-    createPagination(id("cloudBackgroundArt"), backgroundData.cloud, backgroundPaginationSize);
-    createPagination(id("overlayBackgroundArt"), backgroundData.overlay, backgroundPaginationSize);
+    createCarousel(id("backgroundBackgroundArt"), backgroundData.background, bgCarouselSize);
+    createCarousel(id("skyboxBackgroundArt"), backgroundData.skybox, bgCarouselSize);
+    createCarousel(id("cloudBackgroundArt"), backgroundData.cloud, bgCarouselSize);
+    createCarousel(id("overlayBackgroundArt"), backgroundData.overlay, bgCarouselSize);
   }
 
-  function createPagination(container, data, size) {
-    let bgs = [];
+  /**
+   * Creates a carousel that displays background images
+   * @param {HTMLDivElement} container - container for the images
+   * @param {Object} data - data of the background
+   * @param {number} size - size of each background page
+   */
+  function createCarousel(container, data, size) {
+    let images = [];
 
     let prev = document.createElement("button");
     let next = document.createElement("button");
@@ -676,20 +760,20 @@
     imageContainer.classList.add("bg-container");
 
     for(let i = 0; i < size; i ++) {
-      let bg = document.createElement("img");
+      let image = document.createElement("img");
       if(i < data.imgs.length) {
-        bg.src = `https://dragalialost.wiki/thumb.php?f=${data.imgs[i].fileName}&width=75`;
-        bg.dataset.fullSrc = data.imgs[i].url;
+        image.src = `https://dragalialost.wiki/thumb.php?f=${data.imgs[i].fileName}&width=75`;
+        image.dataset.fullSrc = data.imgs[i].url;
       } else {
-        bg.classList.add("hidden");
+        image.classList.add("hidden");
       }
-      bg.addEventListener("click", function() {
+      image.addEventListener("click", function() {
         let activeImage = qs(".tab.active img");
         activeImage.crossOrigin = "anonymous";
         activeImage.src = this.dataset.fullSrc;
       });
-      bgs.push(bg);
-      imageContainer.appendChild(bg);
+      images.push(image);
+      imageContainer.appendChild(image);
     }
 
     prev.addEventListener("click", () => {
@@ -697,7 +781,7 @@
       if(data.index < 0) {
         data.index = 0;
       }
-      updateBackgroundImages(bgs, data);
+      updateBackgroundImages(images, data);
     });
 
     next.addEventListener("click", () => {
@@ -705,7 +789,7 @@
         return;
       }
       data.index += size;
-      updateBackgroundImages(bgs, data);
+      updateBackgroundImages(images, data);
     });
 
     container.appendChild(prev);
@@ -713,22 +797,31 @@
     container.appendChild(next);
   }
 
-  function updateBackgroundImages(bgs, data) {
-    for(let i = 0; i < bgs.length; i++) {
+  /**
+   * Update the background images to display images from the current index of the data
+   * @param {HTMLImageElement[]} images - images for displaying the data
+   * @param {Object} data - data to display
+   */
+  function updateBackgroundImages(images, data) {
+    for(let i = 0; i < images.length; i++) {
       let imgIndex = i + data.index;
       if(imgIndex < data.imgs.length) {
-        bgs[i].src = THUMB_URL + data.imgs[imgIndex].fileName;
-        bgs[i].dataset.fullSrc = data.imgs[imgIndex].url;
-        bgs[i].classList.remove("hidden");
+        images[i].src = THUMB_URL + data.imgs[imgIndex].fileName;
+        images[i].dataset.fullSrc = data.imgs[imgIndex].url;
+        images[i].classList.remove("hidden");
       }
       else {
-        bgs[i].classList.add("hidden");
+        images[i].classList.add("hidden");
       }
     }
   }
 
   /* Portrait Panel */
 
+  /**
+   * Generate a button that toggles the portrait panel
+   * @returns {HTMLButtonElement} button that toggles the portrait panel
+   */
   function portraitPanelToggleButton() {
     let button = document.createElement("button");
     button.innerText = i18n[pageLang].loc.fromPortrait;
@@ -738,6 +831,9 @@
     return button;
   }
 
+  /**
+   * Toggles the portrait panel
+   */
   function togglePortraitPanel() {
     // Toggle portrait panel
     let portraitHidden = id("portraitPanel").classList.toggle("hidden");
@@ -750,6 +846,9 @@
     }
   }
 
+  /**
+   * Fetches data for the available portraits
+   */
   async function populatePortraitData() {
     let portraitData = await fetchJson(PORTRAIT_URL + "portrait_output/localizedDirData.json");
     let datalist = id("portraitList");
@@ -763,6 +862,9 @@
     id("portraitCharacter").addEventListener("change", validateDatalistInput);
   }
 
+  /**
+   * Validates the portrait input to match options in datalist
+   */
   function validateDatalistInput() {
     let option = document.querySelector(`#portraitList option[value="${this.value}"]`);
     if (option === null) {
@@ -772,8 +874,12 @@
     }
   }
 
-  async function loadSelectedPortraitData(portraitId) {
-    let data = await fetchJson(PORTRAIT_URL + `portrait_output/${portraitId}/data.json`);
+  /**
+   * Gets data about the portrait of the character with the given id
+   * @param {string} charId - id of the character
+   */
+  async function loadSelectedPortraitData(charId) {
+    let data = await fetchJson(PORTRAIT_URL + `portrait_output/${charId}/data.json`);
 
     let faceContainer = id("facialExpression");
     faceContainer.innerHTML = "";
@@ -803,12 +909,16 @@
 
     currentPortraitData.face = "";
     currentPortraitData.mouth = "";
-    currentPortraitData.base = PORTRAIT_URL + `portrait_output/${portraitId}/${portraitId}_base.png`;
+    currentPortraitData.base = PORTRAIT_URL + `portrait_output/${charId}/${charId}_base.png`;
     currentPortraitData.offset = data.offset;
 
     drawPortraitAndRender();
   }
 
+  /**
+   * Draws the portrait on the portrait canvas and sets the image source of the
+   * current tab to the portrait canvas
+   */
   async function drawPortraitAndRender() {
     const ctx = portraitCanvas.getContext("2d");
     ctx.clearRect(0, 0, portraitCanvas.width, portraitCanvas.height);
@@ -907,13 +1017,3 @@
   }
 
 })();
-
-function test(textXPos, textYPos) {
-  const canvas = document.getElementById("editor");
-  const ctx = canvas.getContext("2d");
-  const previewCanvas = document.getElementById("preview");
-  const previewCtx = previewCanvas.getContext("2d");
-  ctx.fillStyle = "white";
-  ctx.fillText("test", textXPos, textYPos);
-  previewCtx.drawImage(canvas, 0, 0, previewCanvas.width, previewCanvas.height);
-}
