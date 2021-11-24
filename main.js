@@ -186,17 +186,26 @@
     let x = centerX - width / 2 + offsetX;
     let y = centerY - height / 2 + offsetY;
 
+    // Save current context state
+    ctx.save();
+
     // Move the context to the pivot before rotating
     ctx.translate(centerX + offsetX, centerY + offsetY);
-    ctx.rotate(rotation * Math.PI / 180);
+
+    if(layer.flipX) {
+      ctx.scale(-1, 1);
+    }
+
+    if(rotation !== 0) {
+      ctx.rotate(rotation * Math.PI / 180);
+    }
+
     ctx.translate(-centerX - offsetX, -centerY - offsetY);
 
     ctx.drawImage(layer.image, x, y, width, height);
 
-    // Rotate the context back to original rotation
-    ctx.translate(centerX + offsetX, centerY + offsetY);
-    ctx.rotate(-rotation * Math.PI / 180);
-    ctx.translate(-centerX - offsetX, -centerY - offsetY);
+    // Restore original state
+    ctx.restore();
   }
 
   /**
@@ -335,6 +344,7 @@
       "offsetY": 0,
       "rotation": 0,
       "scale": 1,
+      "flipX": false
     }
 
     // Get a new tab
@@ -592,6 +602,18 @@
     settingContainer.appendChild(createSliderGroup(loc.layerOffsetY, -400, 400, 1, 0, (value) => { layer.offsetY = value; drawDialogueScreen(); }));
     settingContainer.appendChild(createSliderGroup(loc.layerRotation, -180, 180, 0.1, 0, (value) => { layer.rotation = value; drawDialogueScreen(); }));
     let scaleSliderGroup = createSliderGroup(loc.layerScale, 0, 3, 0.1, 1, (value) => { layer.scale = value; drawDialogueScreen(); });
+
+    let flipXContainer = document.createElement("div");
+    let flipXLabel = document.createElement("label");
+
+    flipXLabel.innerText = loc.flipX;
+    let flipX = document.createElement("input");
+    flipX.type = "checkbox";
+    flipX.addEventListener("change", function(){ layer.flipX = this.checked; drawDialogueScreen(); });
+    flipXContainer.appendChild(flipXLabel);
+    flipXContainer.appendChild(flipX);
+
+    settingContainer.appendChild(flipXContainer);
 
     let autoButton = document.createElement("button");
     autoButton.classList.add("button");

@@ -26,7 +26,8 @@
       "download": "Download",
       "generating": "Generating Image...",
       "fromBackground": "Background",
-      "fromPortrait": "Portrait"
+      "fromPortrait": "Portrait",
+      "flipX": "Flip X"
     }
   },
   "zh_tw": {
@@ -56,7 +57,8 @@
       "download": "下載",
       "generating": "圖片生成中...",
       "fromBackground": "背景",
-      "fromPortrait": "美術圖"
+      "fromPortrait": "美術圖",
+      "flipX": "水平翻轉"
     }
   },
   "zh_cn": {
@@ -86,7 +88,8 @@
       "download": "下载",
       "generating": "图片生成中...",
       "fromBackground": "背景",
-      "fromPortrait": "美术图"
+      "fromPortrait": "美术图",
+      "flipX": "水平翻转"
     }
   },
   "jp": {
@@ -115,7 +118,8 @@
       "download": "ダウンロード",
       "generating": "Loading...",
       "fromBackground": "背景",
-      "fromPortrait": "イラスト"
+      "fromPortrait": "イラスト",
+      "flipX": "左右反転"
     }
   }
 }
