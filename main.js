@@ -468,7 +468,7 @@
     tabButton.addEventListener("dragstart", () => { tabButton.classList.add("dragging") });
     tabButton.addEventListener("dragend", () => { tabButton.classList.remove("dragging"); reorderLayer(tabButton) });
     // Prevent long tap context menu
-    tabButton.addEventListener("touchstart", (e) => { e.preventDefault(); tabButton.classList.add("dragging");});
+    tabButton.addEventListener("touchstart", (e) => { tabButton.classList.add("dragging");});
     tabButton.addEventListener("touchend", () => { tabButton.classList.remove("dragging"); reorderLayer(tabButton) });
     tabButton.addEventListener("touchmove", tabTouchOver);
     // Create data for new layer
@@ -562,7 +562,7 @@
   function tabTouchOver(e) {
     e.preventDefault();
     let target = e.targetTouches[0];
-    const after = getDragAfterElement(target.pageX, target.pageY);
+    const after = getDragAfterElement(target.clientX, target.clientY);
     const tab = qs(".dragging");
     if(after == null) {
       id("tabBar").insertBefore(tab, id("addLayer"));
