@@ -46,6 +46,7 @@ html {
   font-weight: bold;
   font-size: 25px;
   line-height: 38px;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23eee' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M5 9l3 -3 3 3'/%3e%3c/svg%3e");
 }
 
 body {
@@ -131,10 +132,6 @@ section {
   background-color: rgb(84, 104, 98);
 }
 
-.tab-bar li:hover {
-  background-color: rgb(118, 89, 245);
-}
-
 .tab {
   display: flex;
   flex-wrap: wrap;
@@ -199,6 +196,12 @@ section {
   display: block;
   cursor: pointer;
   background-color: #bbbbbb;
+  box-sizing: border-box;
+  border: 3px solid transparent;
+}
+
+#backgroundPanel img:hover, #portraitPanel img:hover {
+  border: 3px solid rgb(118, 89, 245);
 }
 
 .bg-container, #facialExpression, #mouthExpression {
@@ -492,5 +495,10 @@ ul {
 
   #toTop {
     display: block;
+  }
+
+  #deletePrompt div {
+    width: 60%;
+    padding: 8%;
   }
 }
