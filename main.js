@@ -1010,7 +1010,7 @@
     let datalist = id("portraitList");
     for(file in portraitData.fileList) {
       let option = document.createElement("option");
-      option.value = portraitData.fileList[file][pageLang];
+      option.value = portraitData.fileList[file][i18n[pageLang].code];
       option.dataset.id = file;
       datalist.appendChild(option);
     }

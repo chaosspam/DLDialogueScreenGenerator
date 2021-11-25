@@ -1,5 +1,6 @@
 {
   "en": {
+    "code" : "en_us",
     "bookYPos": 450,
     "captionSize": 41,
     "captionYPos": 500,
@@ -44,6 +45,7 @@
     "titleYPos": 405
   },
   "zh-Hant": {
+    "code" : "zh_tw",
     "bookYPos": 450,
     "captionSize": 41,
     "captionYPos": 500,
@@ -88,6 +90,7 @@
     "titleYPos": 405
   },
   "zh-Hans": {
+    "code" : "zh_cn",
     "bookYPos": 450,
     "captionSize": 41,
     "captionYPos": 500,
@@ -132,6 +135,7 @@
     "titleYPos": 405
   },
   "ja": {
+    "code" : "jp",
     "bookYPos": 450,
     "captionSize": 41,
     "captionYPos": 500,
